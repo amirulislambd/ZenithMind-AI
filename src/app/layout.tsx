@@ -21,7 +21,7 @@ export default function RootLayout({
         <AuthProvider>
           <ConditionalLayout>{children}</ConditionalLayout>
           <Toaster
-            position="top-right"
+            position="top-center"
             reverseOrder={false}
             gutter={8}
             containerClassName=""
