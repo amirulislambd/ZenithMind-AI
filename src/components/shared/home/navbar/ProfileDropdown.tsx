@@ -1,0 +1,89 @@
+"use client";
+
+import Link from "next/link";
+import { User, LogOut } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+
+interface Props {
+  open: boolean;
+  close: () => void;
+  logout: () => void;
+}
+
+export default function ProfileDropdown({
+  open,
+  close,
+  logout,
+}: Props) {
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          initial={{
+            opacity: 0,
+            y: 10,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          exit={{
+            opacity: 0,
+            y: 10,
+          }}
+          className="
+            absolute
+            right-0
+            mt-3
+            w-56
+            overflow-hidden
+            rounded-2xl
+            border
+            border-white/10
+            bg-[#111827]
+            shadow-xl
+          "
+        >
+          <Link
+            href="/profile"
+            onClick={close}
+            className="
+              flex
+              items-center
+              gap-3
+              px-4
+              py-3
+              text-sm
+              text-slate-300
+              transition
+              hover:bg-white/5
+              hover:text-white
+            "
+          >
+            <User size={16} />
+            Profile
+          </Link>
+
+          <button
+            onClick={logout}
+            className="
+              flex
+              w-full
+              items-center
+              gap-3
+              px-4
+              py-3
+              text-sm
+              text-red-400
+              transition
+              hover:bg-red-500/10
+            "
+          >
+            <LogOut size={16} />
+            Logout
+          </button>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}

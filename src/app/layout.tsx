@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "../context/AuthContext";
-import Navbar from "../components/shared/Navbar";
+import Navbar from "../components/shared/home/navbar/Navbar";
+
 
 // import Footer from "@/components/shared/Footer"; // when you build it
 
