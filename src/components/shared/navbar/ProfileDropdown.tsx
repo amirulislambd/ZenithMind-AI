@@ -39,8 +39,8 @@ export default function ProfileDropdown({
             overflow-hidden
             rounded-2xl
             border
-            border-white/10
-            bg-[#111827]
+            border-[#173056]
+            bg-[#050d24]
             shadow-xl
           "
         >
@@ -54,10 +54,9 @@ export default function ProfileDropdown({
               px-4
               py-3
               text-sm
-              text-slate-300
+              text-[#e2e8f0]
               transition
-              hover:bg-white/5
-              hover:text-white
+              hover:bg-[#0b1e46]
             "
           >
             <User size={16} />
@@ -74,9 +73,9 @@ export default function ProfileDropdown({
               px-4
               py-3
               text-sm
-              text-red-400
+              text-[#dc2626]
               transition
-              hover:bg-red-500/10
+              hover:bg-[rgba(220,38,38,0.08)]
             "
           >
             <LogOut size={16} />

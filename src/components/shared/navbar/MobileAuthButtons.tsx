@@ -23,14 +23,15 @@ export default function MobileAuthButtons({
           items-center
           justify-center
           rounded-2xl
-          bg-cyan-500
           px-4
           py-3
-          text-sm
-          font-semibold
           text-white
+          font-semibold
+          bg-linear-to-r
+          from-[#1666ff]
+          to-[#0d4cff]
           transition
-          hover:bg-cyan-400
+          hover:opacity-95
         "
       >
         Login
@@ -49,13 +50,13 @@ export default function MobileAuthButtons({
         gap-2
         rounded-2xl
         border
-        border-red-500/20
-        bg-red-500/10
+        border-[#173056]
+        bg-[#081429]
         px-4
         py-3
         text-sm
         font-semibold
-        text-red-400
+        text-[#e2e8f0]
       "
     >
       <LogOut className="h-4 w-4" />

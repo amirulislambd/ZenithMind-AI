@@ -18,8 +18,8 @@ export default function DesktopNav({
           href={route.href}
           className={`text-sm font-medium transition ${
             isActive(route.href)
-              ? "text-cyan-400"
-              : "text-slate-300 hover:text-white"
+              ? "text-[#7db0ff]"
+              : "text-[#cbd5e1] hover:text-white"
           }`}
         >
           {route.label}

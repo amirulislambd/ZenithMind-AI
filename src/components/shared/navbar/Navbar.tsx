@@ -57,8 +57,8 @@ export default function Navbar() {
           top-0
           z-50
           border-b
-          border-white/10
-          bg-[#0B1120]/80
+          border-[#1e293b]/40
+          bg-[#0b1120]/95
           backdrop-blur-xl
         "
       >
@@ -86,13 +86,19 @@ export default function Navbar() {
               <Link
                 href="/login"
                 className="
-                  rounded-xl
-                  bg-cyan-500
+                  rounded-full
+                  bg-linear-to-r
+                  from-[#1666ff]
+                  to-[#0d4cff]
                   px-5
                   py-2
                   text-sm
                   font-semibold
                   text-white
+                  shadow-lg
+                  shadow-[#1666ff]/20
+                  transition
+                  hover:opacity-95
                 "
               >
                 Login
@@ -148,11 +154,9 @@ export default function Navbar() {
           </div>
 
           <button
-            onClick={() =>
-              setMobileOpen(true)
-            }
+            onClick={() => setMobileOpen(true)}
             className="
-              text-white
+              text-[#e2e8f0]
               cursor-pointer
               focus:outline-none
               md:hidden

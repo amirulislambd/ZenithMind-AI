@@ -17,10 +17,8 @@ export default function MobileUserCard({
         mt-6
         rounded-3xl
         border
-        border-cyan-500/20
-        bg-gradient-to-br
-        from-cyan-500/10
-        to-blue-500/10
+        border-[#173056]
+        bg-[#081429]
         p-4
       "
     >
@@ -34,7 +32,7 @@ export default function MobileUserCard({
               w-14
               rounded-full
               border-2
-              border-cyan-500/30
+              border-[#10b981]/30
               object-cover
             "
           />
@@ -47,12 +45,13 @@ export default function MobileUserCard({
               items-center
               justify-center
               rounded-full
-              bg-gradient-to-r
-              from-cyan-500
-              to-blue-500
+              bg-linear-to-r
+              from-[#1e293b]
+              via-[#10b981]
+              to-[#6366f1]
               text-xl
               font-bold
-              text-white
+              text-[#e2e8f0]
             "
           >
             {user.name?.charAt(0).toUpperCase()}
@@ -60,11 +59,11 @@ export default function MobileUserCard({
         )}
 
         <div className="min-w-0 flex-1">
-          <h3 className="truncate font-semibold text-white">
+          <h3 className="truncate font-semibold text-[#e2e8f0]">
             {user.name}
           </h3>
 
-          <p className="truncate text-xs text-slate-400">
+          <p className="truncate text-xs text-[#94a3b8]">
             {user.email}
           </p>
         </div>

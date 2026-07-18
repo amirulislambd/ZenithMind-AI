@@ -41,7 +41,7 @@ export default function MobileDrawer({
               fixed
               inset-0
               z-40
-              bg-black/60
+              bg-[#050d24]/70
               backdrop-blur-sm
             "
           />
@@ -65,19 +65,19 @@ export default function MobileDrawer({
               w-[320px]
               flex-col
               border-l
-              border-white/10
-              bg-[#0B1120]
+              border-[#173056]/50
+              bg-[#050d24]
               p-6
             "
           >
             <div className="flex items-center justify-between">
-              <h2 className="font-bold text-white">
+              <h2 className="font-bold text-[#e2e8f0]">
                 Menu
               </h2>
 
               <button
                 onClick={close}
-                className="text-slate-400 cursor-pointer hover:text-white"
+                className="text-[#cbd5e1] cursor-pointer hover:text-white"
               >
                 <X />
               </button>
@@ -95,7 +95,7 @@ export default function MobileDrawer({
               />
             </div>
 
-            <div className="border-t border-white/10 pt-4">
+            <div className="border-t border-[#1e293b]/30 pt-4">
               <MobileAuthButtons
                 user={user}
                 logout={logout}
@@ -103,11 +103,11 @@ export default function MobileDrawer({
               />
 
               <div className="mt-5 text-center">
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-[#94a3b8]">
                   Powered by ZenithMind AI
                 </p>
 
-                <p className="mt-1 text-xs text-slate-600">
+                <p className="mt-1 text-xs text-[#64748b]">
                   © {new Date().getFullYear()}
                 </p>
               </div>

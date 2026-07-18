@@ -1,29 +1,50 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
-
-interface AuthUser {
-  name: string;
-  email: string;
-  role: "user" | "admin";
-  imageUrl?: string;
-}
+import { createContext, useContext, ReactNode, useEffect } from "react";
+import { useSession, signOut } from "../lib/auth-client";
+import { usePathname, useRouter } from "next/navigation";
 
 interface AuthContextType {
-  user: AuthUser | null;
-  logout: () => void;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    image?: string | null;
+    emailVerified: boolean;
+  } | null;
+  session: any | null;
+  isLoading: boolean;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  // TODO: replace with real Better Auth session (useSession) once wired up
-  const [user, setUser] = useState<AuthUser | null>(null);
+  const { data: session, isPending: isLoading } = useSession();
+  const router = useRouter();
+  const pathname = usePathname();
 
-  const logout = () => setUser(null);
+  useEffect(() => {
+    if (session?.user && !isLoading) {
+      if (pathname === "/login" || pathname === "/register") {
+        router.push("/dashboard");
+      }
+    }
+  }, [session, isLoading, pathname, router]);
+
+  const logout = async () => {
+    await signOut();
+  };
 
   return (
-    <AuthContext.Provider value={{ user, logout }}>
+    <AuthContext.Provider
+      value={{
+        user: session?.user || null,
+        session: session || null,
+        isLoading,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

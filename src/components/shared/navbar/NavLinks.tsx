@@ -40,8 +40,8 @@ export default function NavLinks({
 
               ${
                 isActive(route.href)
-                  ? "border border-cyan-500/20 bg-cyan-500/15 text-cyan-400"
-                  : "text-slate-300 hover:bg-white/5 hover:text-white"
+                  ? "border border-[#0d4cff]/20 bg-[#081d46] text-[#7db0ff]"
+                  : "text-[#cbd5e1] hover:bg-[#0c1832] hover:text-white"
               }
             `}
           >
