@@ -23,40 +23,22 @@ export default function MobileUserCard({
       "
     >
       <div className="flex items-center gap-3">
-        {user.imageUrl ? (
-          <img
-            src={user.imageUrl}
-            alt={user.name}
-            className="
-              h-14
-              w-14
-              rounded-full
-              border-2
-              border-[#10b981]/30
-              object-cover
-            "
+        <div className="relative h-14 w-14 rounded-full overflow-hidden border-2 border-[#10b981]/30 bg-gradient-to-r from-[#1e293b] via-[#10b981] to-[#6366f1] flex items-center justify-center shrink-0">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img 
+            src={(user as any).image || (user as any).imageUrl || ""} 
+            alt={user.name || "User"} 
+            className="h-full w-full object-cover" 
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = 'none';
+              (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+            }}
+            style={{ display: ((user as any).image || (user as any).imageUrl) ? 'block' : 'none' }}
           />
-        ) : (
-          <div
-            className="
-              flex
-              h-14
-              w-14
-              items-center
-              justify-center
-              rounded-full
-              bg-linear-to-r
-              from-[#1e293b]
-              via-[#10b981]
-              to-[#6366f1]
-              text-xl
-              font-bold
-              text-[#e2e8f0]
-            "
-          >
-            {user.name?.charAt(0).toUpperCase()}
-          </div>
-        )}
+          <span className={`text-xl font-bold text-[#e2e8f0] ${((user as any).image || (user as any).imageUrl) ? 'hidden' : ''}`}>
+            {user.name ? user.name.substring(0, 2).toUpperCase() : 'U'}
+          </span>
+        </div>
 
         <div className="min-w-0 flex-1">
           <h3 className="truncate font-semibold text-[#e2e8f0]">

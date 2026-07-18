@@ -117,28 +117,27 @@ export default function Navbar() {
                     gap-2
                   "
                 >
-                  <img
-                    src={
-                      user.imageUrl ||
-                      "/avatar.png"
-                    }
-                    alt={user.name}
-                    className="
-                      h-10
-                      w-10
-                      rounded-full
-                    "
-                  />
+                  <div className="relative h-10 w-10 rounded-full overflow-hidden border border-slate-600 bg-slate-800 flex items-center justify-center shrink-0">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img 
+                      src={(user as any).image || (user as any).imageUrl || ""} 
+                      alt={user.name || "User"} 
+                      className="h-full w-full object-cover" 
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                        (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                      }}
+                      style={{ display: ((user as any).image || (user as any).imageUrl) ? 'block' : 'none' }}
+                    />
+                    <span className={`text-sm font-semibold text-white ${((user as any).image || (user as any).imageUrl) ? 'hidden' : ''}`}>
+                      {user.name ? user.name.substring(0, 2).toUpperCase() : 'U'}
+                    </span>
+                  </div>
 
                   <ChevronDown
-                    className={`
-                      transition
-                      ${
-                        profileOpen
-                          ? "rotate-180"
-                          : ""
-                      }
-                    `}
+                    className={`text-[#e2e8f0] transition ${
+                      profileOpen ? "rotate-180" : ""
+                    }`}
                   />
                 </button>
 
@@ -153,17 +152,39 @@ export default function Navbar() {
             )}
           </div>
 
-          <button
-            onClick={() => setMobileOpen(true)}
-            className="
-              text-[#e2e8f0]
-              cursor-pointer
-              focus:outline-none
-              md:hidden
-            "
-          >
-            <Menu />
-          </button>
+          <div className="flex items-center gap-4 md:hidden">
+            {user && (
+              <button
+                onClick={() => setMobileOpen(true)}
+                className="relative h-8 w-8 rounded-full overflow-hidden border border-slate-600 bg-slate-800 flex items-center justify-center shrink-0 focus:outline-none"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img 
+                  src={(user as any).image || (user as any).imageUrl || ""} 
+                  alt={user.name || "User"} 
+                  className="h-full w-full object-cover" 
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'none';
+                    (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                  }}
+                  style={{ display: ((user as any).image || (user as any).imageUrl) ? 'block' : 'none' }}
+                />
+                <span className={`text-xs font-semibold text-white ${((user as any).image || (user as any).imageUrl) ? 'hidden' : ''}`}>
+                  {user.name ? user.name.substring(0, 2).toUpperCase() : 'U'}
+                </span>
+              </button>
+            )}
+            <button
+              onClick={() => setMobileOpen(true)}
+              className="
+                text-[#e2e8f0]
+                cursor-pointer
+                focus:outline-none
+              "
+            >
+              <Menu />
+            </button>
+          </div>
         </nav>
       </header>
 

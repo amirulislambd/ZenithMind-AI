@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "../context/AuthContext";
-import Navbar from "../components/shared/navbar/Navbar";
-import Footer from "../components/shared/Footer";
+
 import { Toaster } from "react-hot-toast";
+import ConditionalLayout from "../components/shared/ConditionalLayout";
 
 export const metadata: Metadata = {
   title: "ZenithMind AI",
@@ -19,9 +19,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AuthProvider>
-          <Navbar />
-          {children}
-          <Footer />
+          <ConditionalLayout>{children}</ConditionalLayout>
           <Toaster
             position="top-right"
             reverseOrder={false}
