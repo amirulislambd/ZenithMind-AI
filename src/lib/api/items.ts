@@ -1,11 +1,17 @@
 "use client";
 
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { GetServer } from "../core/servermutaion";
 
-const DEFAULT_CATEGORIES = ["All", "Stress Relief", "Sleep Optimization", "Executive Recovery", "Focus Boost"];
+const DEFAULT_CATEGORIES = [
+  "All",
+  "Stress Relief",
+  "Sleep Optimization",
+  "Executive Recovery",
+  "Focus Boost",
+];
 
 export const useGetKits = () => {
   const router = useRouter();
@@ -39,7 +45,9 @@ export const useGetKits = () => {
     }
 
     const queryString = params.toString();
-    router.replace(queryString ? `${pathname}?${queryString}` : pathname, { scroll: false });
+    router.replace(queryString ? `${pathname}?${queryString}` : pathname, {
+      scroll: false,
+    });
   };
 
   const setSearchQuery = (value: string) => {
@@ -92,7 +100,9 @@ export const useGetKits = () => {
   const allKits = data ? data.pages.flatMap((page: unknown[]) => page) : [];
 
   const categories = useMemo(() => {
-    const fromData = Array.from(new Set(allKits.map((kit: any) => kit.category).filter(Boolean)));
+    const fromData = Array.from(
+      new Set(allKits.map((kit: any) => kit.category).filter(Boolean)),
+    );
     return Array.from(new Set([...DEFAULT_CATEGORIES, ...fromData]));
   }, [allKits]);
 
@@ -109,5 +119,32 @@ export const useGetKits = () => {
     isFetchingNextPage,
     isError,
     errorMessage: error?.message,
+  };
+};
+
+export const useGetItemDetails = (id: string) => {
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ["item-details", id],
+    queryFn: async () => {
+      if (!id) return null;
+
+      const response = await GetServer(`/items/${id}`);
+
+      if (!response || !response.success) {
+        throw new Error(response?.error || "Failed to fetch kit details");
+      }
+
+      return response.data;
+    },
+    enabled: !!id,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  return {
+    item: data?.item || null,
+    relatedItems: data?.relatedItems || [],
+    isLoading,
+    isError,
+    errorMessage: error?.message || "Something went wrong",
   };
 };
