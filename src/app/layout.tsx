@@ -18,11 +18,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <AuthProvider>
-          <Navbar />
-          {children}
-          {/* <Footer /> */}
-        </AuthProvider>
+        <main className="flex min-h-screen flex-col transition-colors duration-300">
+          <AuthProvider>
+            <Navbar />
+            {children}
+            {/* <Footer /> */}
+          </AuthProvider>
+        </main>
       </body>
     </html>
   );
