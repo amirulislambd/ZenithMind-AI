@@ -15,6 +15,8 @@ import {
   Sparkles,
   Menu,
   X,
+  PlusCircle,
+  FolderKanban,
 } from "lucide-react";
 
 interface NavItem {
@@ -44,6 +46,18 @@ const NAV_ITEMS: NavItem[] = [
     label: "My Profile",
     href: "/dashboard/profile",
     icon: <UserCircle size={18} />,
+  },
+  {
+    label: "Add Wellness Kit",
+    href: "/items/add",
+    icon: <PlusCircle size={18} />,
+    adminOnly: true,
+  },
+  {
+    label: "Manage Kits",
+    href: "/items/manage",
+    icon: <FolderKanban size={18} />,
+    adminOnly: true,
   },
   {
     label: "Admin Panel",

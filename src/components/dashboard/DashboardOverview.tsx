@@ -10,6 +10,9 @@ import {
   Clock,
   ArrowRight,
   Zap,
+  FolderKanban,
+  PlusCircle,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -134,34 +137,69 @@ export default function DashboardOverview() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard
-          icon={<Activity size={20} className="text-[#6366f1]" />}
-          label="Stress Index"
-          value="42%"
-          sub="↓ 8% from last week"
-          color="bg-[#6366f1]/10"
-        />
-        <StatCard
-          icon={<Brain size={20} className="text-[#10b981]" />}
-          label="Cognitive Score"
-          value="87/100"
-          sub="↑ 12 pts this month"
-          color="bg-[#10b981]/10"
-        />
-        <StatCard
-          icon={<TrendingUp size={20} className="text-blue-400" />}
-          label="Focus Sessions"
-          value="24"
-          sub="Sessions logged this week"
-          color="bg-blue-500/10"
-        />
-        <StatCard
-          icon={<Sparkles size={20} className="text-amber-400" />}
-          label="AI Insights"
-          value="7"
-          sub="New recommendations today"
-          color="bg-amber-500/10"
-        />
+        {userRole === "admin" ? (
+          <>
+            <StatCard
+              icon={<Users size={20} className="text-[#6366f1]" />}
+              label="Total Users"
+              value="1,248"
+              sub="↑ 12% from last month"
+              color="bg-[#6366f1]/10"
+            />
+            <StatCard
+              icon={<FolderKanban size={20} className="text-[#10b981]" />}
+              label="Active Kits"
+              value="42"
+              sub="3 kits pending review"
+              color="bg-[#10b981]/10"
+            />
+            <StatCard
+              icon={<TrendingUp size={20} className="text-blue-400" />}
+              label="Premium Subs"
+              value="312"
+              sub="↑ 8 new this week"
+              color="bg-blue-500/10"
+            />
+            <StatCard
+              icon={<Activity size={20} className="text-amber-400" />}
+              label="System Health"
+              value="99.9%"
+              sub="All services operational"
+              color="bg-amber-500/10"
+            />
+          </>
+        ) : (
+          <>
+            <StatCard
+              icon={<Activity size={20} className="text-[#6366f1]" />}
+              label="Stress Index"
+              value="42%"
+              sub="↓ 8% from last week"
+              color="bg-[#6366f1]/10"
+            />
+            <StatCard
+              icon={<Brain size={20} className="text-[#10b981]" />}
+              label="Cognitive Score"
+              value="87/100"
+              sub="↑ 12 pts this month"
+              color="bg-[#10b981]/10"
+            />
+            <StatCard
+              icon={<TrendingUp size={20} className="text-blue-400" />}
+              label="Focus Sessions"
+              value="24"
+              sub="Sessions logged this week"
+              color="bg-blue-500/10"
+            />
+            <StatCard
+              icon={<Sparkles size={20} className="text-amber-400" />}
+              label="AI Insights"
+              value="7"
+              sub="New recommendations today"
+              color="bg-amber-500/10"
+            />
+          </>
+        )}
       </div>
 
       {/* Quick Actions */}
@@ -185,6 +223,29 @@ export default function DashboardOverview() {
           />
         </div>
       </div>
+
+      {/* Content Management */}
+      {userRole === "admin" && (
+        <div className="mb-8">
+          <h2 className="text-sm font-semibold text-[#94a3b8] uppercase tracking-wider mb-4">
+            Content Management
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <QuickActionCard
+              icon={<PlusCircle size={22} />}
+              title="Add Wellness Kit"
+              description="Create and publish new cognitive health resources and wellness items."
+              href="/items/add"
+            />
+            <QuickActionCard
+              icon={<FolderKanban size={22} />}
+              title="Manage Kits"
+              description="Oversee and manage all wellness items on the platform."
+              href="/items/manage"
+            />
+          </div>
+        </div>
+      )}
 
       {/* Admin Panel Quick Access */}
       {userRole === "admin" && (
@@ -221,28 +282,52 @@ export default function DashboardOverview() {
           Recent Activity
         </h2>
         <div className="bg-[#0b1120] border border-[#1e293b] rounded-2xl divide-y divide-[#1e293b]">
-          {[
-            {
-              action: "AI Chat session completed",
-              time: "2 hours ago",
-              icon: <Brain size={14} className="text-[#6366f1]" />,
-            },
-            {
-              action: "Cognitive assessment submitted",
-              time: "Yesterday",
-              icon: <Activity size={14} className="text-[#10b981]" />,
-            },
-            {
-              action: "Focus session: 45 minutes",
-              time: "2 days ago",
-              icon: <TrendingUp size={14} className="text-blue-400" />,
-            },
-            {
-              action: "Stress report generated",
-              time: "3 days ago",
-              icon: <Sparkles size={14} className="text-amber-400" />,
-            },
-          ].map((item, i) => (
+          {(userRole === "admin"
+            ? [
+                {
+                  action: "New user registration: alex@example.com",
+                  time: "10 mins ago",
+                  icon: <Users size={14} className="text-[#6366f1]" />,
+                },
+                {
+                  action: "Wellness kit 'Sleep Optimization' updated",
+                  time: "2 hours ago",
+                  icon: <FolderKanban size={14} className="text-[#10b981]" />,
+                },
+                {
+                  action: "System database automated backup completed",
+                  time: "5 hours ago",
+                  icon: <ShieldCheck size={14} className="text-blue-400" />,
+                },
+                {
+                  action: "User upgraded to Premium Plan",
+                  time: "Yesterday",
+                  icon: <TrendingUp size={14} className="text-amber-400" />,
+                },
+              ]
+            : [
+                {
+                  action: "AI Chat session completed",
+                  time: "2 hours ago",
+                  icon: <Brain size={14} className="text-[#6366f1]" />,
+                },
+                {
+                  action: "Cognitive assessment submitted",
+                  time: "Yesterday",
+                  icon: <Activity size={14} className="text-[#10b981]" />,
+                },
+                {
+                  action: "Focus session: 45 minutes",
+                  time: "2 days ago",
+                  icon: <TrendingUp size={14} className="text-blue-400" />,
+                },
+                {
+                  action: "Stress report generated",
+                  time: "3 days ago",
+                  icon: <Sparkles size={14} className="text-amber-400" />,
+                },
+              ]
+          ).map((item, i) => (
             <div
               key={i}
               className="flex items-center gap-3 px-5 py-3.5 hover:bg-[#0d1428] transition-colors"
