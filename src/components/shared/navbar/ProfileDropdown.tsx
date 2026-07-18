@@ -45,7 +45,7 @@ export default function ProfileDropdown({
           "
         >
           <Link
-            href="/profile"
+            href="/dashboard/profile"
             onClick={close}
             className="
               flex

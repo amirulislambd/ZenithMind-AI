@@ -41,13 +41,52 @@ export const ServerMutation = async (
     if (!res.ok) {
       throw new Error(
         responseData.message ||
-          `Failed to ${method} ${url}, status: ${res.status}`,
+        `Failed to ${method} ${url}, status: ${res.status}`,
       );
     }
 
     return { success: true, data: responseData };
   } catch (error: any) {
     console.error("Server Action Error:", error);
+    return { success: false, error: error.message || "Something went wrong" };
+  }
+};
+
+export const ServerDelete = async (
+  url: string,
+  data?: any,
+  requireAuth: boolean = true,
+) => {
+  try {
+    const headers = await authHeaders(requireAuth);
+
+    if (data && headers instanceof Headers) {
+      headers.set("Content-Type", "application/json");
+    } else if (data && typeof headers === "object") {
+      (headers as any)["Content-Type"] = "application/json";
+    }
+
+    const res = await fetch(`${baseUrl}${url}`, {
+      method: "DELETE",
+      headers,
+      body: data ? JSON.stringify(data) : undefined,
+      cache: "no-store",
+    });
+
+    const textData = await res.text();
+    const responseData = textData ? JSON.parse(textData) : null;
+
+    if (!res.ok) {
+      throw new Error(
+        responseData?.message ||
+        responseData?.error ||
+        `Failed to DELETE ${url}, status: ${res.status}`,
+      );
+    }
+
+    return { success: true, data: responseData };
+  } catch (error: any) {
+    console.error("Server Delete Error:", error);
     return { success: false, error: error.message || "Something went wrong" };
   }
 };
