@@ -1,54 +1,79 @@
 @import "tailwindcss";
-
+@import "@heroui/styles"; 
 /* ── Tailwind v4 theme tokens ──────────────────────────────────────────
    Defining colors here (via @theme) automatically generates utility
    classes like bg-primary, text-accent, border-secondary, etc.
    This is the ONLY place colors are configured — no tailwind.config file
    needed or used in this project (Next.js 16 + Tailwind v4).
    ──────────────────────────────────────────────────────────────────── */
-@theme {
-  /* Near-black navy — backgrounds, dark surfaces */
-  --color-primary: #04050f;
-  --color-primary-light: #131a3d;
-
-  /* Electric blue — primary CTA / interactive color */
-  --color-secondary: #2563eb;
-  --color-secondary-light: #60a5fa;
-
-  /* Cyan glow — badges, highlights, glow accents */
-  --color-accent: #38bdf8;
-  --color-accent-light: #7dd3fc;
-
-  /* Off-white — text/surfaces on dark backgrounds */
-  --color-neutral: #f4f6fb;
-  --color-neutral-dark: #cbd5e1;
-}
-
-:root {
-  --background: var(--color-primary);
-  --foreground: var(--color-neutral);
-  --surface: #0a0e21;
-  --surface-strong: #0f1530;
-  --surface-soft: #131a3d;
-  --muted: #94a3b8;
-  --text-muted: #a8b3cf;
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-/* Reusable glow effect for CTAs and badges, matching the reference design */
-.glow-pill {
-  box-shadow: 0 0 24px 4px rgba(37, 99, 235, 0.45);
-}
-
-/* Subtle grid-line background pattern used behind hero/section headers */
-.grid-bg {
-  background-image:
-    linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
-  background-size: 40px 40px;
-}
+   @theme {
+     /* Near-black navy — backgrounds, dark surfaces */
+     --color-primary: #04050f;
+     --color-primary-light: #131a3d;
+    
+     /* Electric blue — primary CTA / interactive color */
+     --color-secondary: #2563eb;
+     --color-secondary-light: #60a5fa;
+    
+     /* Cyan glow — badges, highlights, glow accents */
+     --color-accent: #38bdf8;
+     --color-accent-light: #7dd3fc;
+    
+     /* Off-white — text/surfaces on dark backgrounds */
+     --color-neutral: #f4f6fb;
+     --color-neutral-dark: #cbd5e1;
+   }
+    
+   :root {
+     --background: var(--color-primary);
+     --foreground: var(--color-neutral);
+     --surface: #0a0e21;
+     --surface-strong: #0f1530;
+     --surface-soft: #131a3d;
+     --muted: #94a3b8;
+     --text-muted: #a8b3cf;
+   }
+    
+   body {
+     background: var(--background);
+     color: var(--foreground);
+     font-family: Arial, Helvetica, sans-serif;
+   }
+    
+   /* Reusable glow effect for CTAs and badges, matching the reference design */
+   .glow-pill {
+     box-shadow: 0 0 24px 4px rgba(37, 99, 235, 0.45);
+   }
+    
+   /* Subtle grid-line background pattern used behind hero/section headers */
+   .grid-bg {
+     background-image:
+       linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+       linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+     background-size: 40px 40px;
+   }
+    
+   /* Theme-independent shimmer skeleton — uses its own animated cyan sweep
+      instead of a flat background color, so it stays visible whether the
+      page background is dark (now) or light (future theme change). */
+   @keyframes shimmer-sweep {
+     0% {
+       background-position: -400px 0;
+     }
+     100% {
+       background-position: 400px 0;
+     }
+   }
+    
+   .skeleton-shimmer {
+     background-color: rgba(148, 163, 184, 0.08);
+     background-image: linear-gradient(
+       90deg,
+       rgba(148, 163, 184, 0.06) 25%,
+       rgba(56, 189, 248, 0.22) 37%,
+       rgba(148, 163, 184, 0.06) 63%
+     );
+     background-size: 800px 100%;
+     animation: shimmer-sweep 1.6s linear infinite;
+   }
+    

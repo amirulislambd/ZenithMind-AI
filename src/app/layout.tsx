@@ -4,6 +4,7 @@ import { AuthProvider } from "../context/AuthContext";
 
 import { Toaster } from "react-hot-toast";
 import ConditionalLayout from "../components/shared/ConditionalLayout";
+import QueryProvider from "../components/providers/QueryProvider";
 
 export const metadata: Metadata = {
   title: "ZenithMind AI",
@@ -19,22 +20,24 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AuthProvider>
-          <ConditionalLayout>{children}</ConditionalLayout>
-          <Toaster
-            position="top-center"
-            reverseOrder={false}
-            gutter={8}
-            containerClassName=""
-            containerStyle={{}}
-            toastOptions={{
-              className: "",
-              duration: 4000,
-              style: {
-                background: "#fff",
-                color: "#000",
-              },
-            }}
-          />
+          <QueryProvider>
+            <ConditionalLayout>{children}</ConditionalLayout>
+            <Toaster
+              position="top-center"
+              reverseOrder={false}
+              gutter={8}
+              containerClassName=""
+              containerStyle={{}}
+              toastOptions={{
+                className: "",
+                duration: 4000,
+                style: {
+                  background: "#fff",
+                  color: "#000",
+                },
+              }}
+            />
+          </QueryProvider>
         </AuthProvider>
       </body>
     </html>
