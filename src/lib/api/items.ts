@@ -4,6 +4,7 @@ import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { GetServer } from "../core/servermutaion";
+import { IWellnessItem } from "@/src/types/item";
 
 const DEFAULT_CATEGORIES = [
   "All",
@@ -146,5 +147,27 @@ export const useGetItemDetails = (id: string) => {
     isLoading,
     isError,
     errorMessage: error?.message || "Something went wrong",
+  };
+};
+
+export const useFeaturedKits = (limit = 4) => {
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ["featured-kits", limit],
+    queryFn: async (): Promise<IWellnessItem[]> => {
+      const params = new URLSearchParams({ page: "1", limit: String(limit) });
+      const response = await GetServer(`/items?${params.toString()}`);
+      if (!response || !response.success) {
+        throw new Error(response?.error || "Failed to fetch featured kits");
+      }
+      return response.data?.items || response.data || [];
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+
+  return {
+    items: data ?? [],
+    isLoading,
+    isError,
+    errorMessage: error instanceof Error ? error.message : undefined,
   };
 };

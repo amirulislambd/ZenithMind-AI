@@ -73,12 +73,12 @@ const featuredItems: IWellnessItem[] = [
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen flex-col flex-1 items-center justify-center bg-white font-sans">
+    <div className="flex min-h-screen flex-col flex-1 items-center justify-center bg-primary font-sans text-neutral">
       <main className="w-full">
         <Hero />
         <Features />
         <Categories />
-        <FeaturedItems items={featuredItems} />
+        <FeaturedItems />
         <Stats />
         <Testimonials />
         <AIHighlight />

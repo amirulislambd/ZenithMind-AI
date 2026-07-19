@@ -3,18 +3,21 @@ import { ArrowRight, Brain, FileSearch } from "lucide-react";
 
 export default function AIHighlight() {
   return (
-    <section className="bg-white px-4 py-12 md:px-8 md:py-20 lg:px-16">
-      <div className="mx-auto max-w-7xl rounded-[2rem] border border-slate-200 bg-[#0f172a] p-8 text-white shadow-sm md:p-10 lg:p-14">
+    <section className="bg-primary px-4 py-12 md:px-8 md:py-20 lg:px-16">
+      <div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-primary-light/60 p-8 text-neutral shadow-[0_0_50px_-12px_rgba(37,99,235,0.35)] md:p-10 lg:p-14">
         <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#93c5fd]">
               Agentic AI, elevated
             </p>
             <h2 className="mt-3 text-3xl font-semibold md:text-4xl">
-              Meet the two AI companions that make recovery proactive instead of reactive.
+              Meet the two AI companions that make recovery proactive instead of
+              reactive.
             </h2>
             <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-300">
-              The conversational guide helps you think clearly in the moment, while the file analyzer turns complex wellness data into practical next steps.
+              The conversational guide helps you think clearly in the moment,
+              while the file analyzer turns complex wellness data into practical
+              next steps.
             </p>
             <Link
               href="/dashboard"
@@ -33,7 +36,9 @@ export default function AIHighlight() {
                 </div>
                 <div>
                   <h3 className="font-semibold">AI Conversational Guide</h3>
-                  <p className="text-sm text-slate-300">Adaptive coaching for stress, focus, and recovery planning.</p>
+                  <p className="text-sm text-slate-300">
+                    Adaptive coaching for stress, focus, and recovery planning.
+                  </p>
                 </div>
               </div>
             </div>
@@ -44,7 +49,10 @@ export default function AIHighlight() {
                 </div>
                 <div>
                   <h3 className="font-semibold">File Data Analyzer</h3>
-                  <p className="text-sm text-slate-300">Find patterns in CSV and wellness exports without needing a spreadsheet expert.</p>
+                  <p className="text-sm text-slate-300">
+                    Find patterns in CSV and wellness exports without needing a
+                    spreadsheet expert.
+                  </p>
                 </div>
               </div>
             </div>
