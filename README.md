@@ -1,36 +1,89 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ZenithMind AI
 
-## Getting Started
+ZenithMind AI is a premium cognitive health, stress management, and burnout tracking platform built with Next.js and modern AI-driven experiences. The product combines wellness content, intelligent chat, personalized dashboards, and exploration tools into a single polished experience.
 
-First, run the development server:
+## What this project includes
+
+- A modern landing experience with hero, features, categories, stats, testimonials, FAQ, and newsletter sections
+- A public explore experience for wellness kits and curated content
+- Authenticated dashboard flows for profile, administration, item management, and AI-powered interactions
+- AI chat and analysis experiences powered by backend API routes
+- A responsive, dark navy visual theme aligned with the project direction
+
+## Key features
+
+- AI-powered wellness guidance and chat experience
+- Burnout and cognitive health tracking workflows for users
+- Personalized dashboard with profile and admin management
+- Item exploration and discovery with rich card-based browsing
+- Secure authentication and role-aware access control
+- Clean, responsive UI designed for desktop and mobile
+
+## Tech stack
+
+- Frontend: Next.js 16, React 19, TypeScript, Tailwind CSS, TanStack Query, Framer Motion
+- UI libraries: HeroUI, Lucide React, React Hook Form, Zod
+- Backend integration: Better Auth, MongoDB, React Hot Toast
+- Build tooling: ESLint, TypeScript
+
+## Project structure
+
+- src/app: app routes, pages, and API handlers
+- src/components: reusable UI, dashboard, home, shared, and explore components
+- src/lib: auth, API helpers, and shared logic
+- src/types: shared TypeScript interfaces
+
+## Getting started
+
+### Prerequisites
+
+- Node.js 20+
+- npm
+- A MongoDB instance for authentication and data persistence
+
+### Install dependencies
+
+```bash
+npm install
+```
+
+### Environment variables
+
+Create a local environment file based on your setup:
+
+```bash
+cp .env.example .env.local
+```
+
+Recommended variables:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:5000/api
+NEXT_PUBLIC_BETTER_AUTH_URL=http://localhost:3000
+NEXT_PUBLIC_IMGBB_API_KEY=your_imgbb_key
+MONGODB_URI=mongodb://localhost:27017/zenithmind
+BETTER_AUTH_SECRET=your_secret_key
+BETTER_AUTH_URL=http://localhost:3000
+```
+
+### Run the app locally
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Available scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run dev
+npm run build
+npm run start
+npm run lint
+```
 
-## Learn More
+## Notes
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- The project is designed for a polished SaaS-style experience rather than a basic starter template.
+- The README will continue to evolve as new dashboard, AI, and content management features are added.
