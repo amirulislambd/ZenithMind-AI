@@ -5,7 +5,28 @@ import { mongodbAdapter } from "better-auth/adapters/mongodb";
 const client = new MongoClient(process.env.MONGODB_URI as string);
 const db = client.db("zenith-mind");
 
+const getBaseUrl = () => {
+  const configuredUrl =
+    process.env.NEXT_PUBLIC_BETTER_AUTH_URL ||
+    process.env.BETTER_AUTH_URL ||
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    process.env.SITE_URL ||
+    process.env.NEXT_PUBLIC_VERCEL_URL;
+
+  if (configuredUrl) {
+    return configuredUrl.replace(/\/$/, "");
+  }
+
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`.replace(/\/$/, "");
+  }
+
+  return "http://localhost:3000";
+};
+
 export const auth = betterAuth({
+  baseURL: getBaseUrl(),
+  trustedOrigins: [getBaseUrl()].filter(Boolean),
 
   emailAndPassword: {
     enabled: true,
@@ -20,7 +41,7 @@ export const auth = betterAuth({
 
   database: mongodbAdapter(db, {
     // Optional: if you don't provide a client, database transactions won't be enabled.
-    client
+    client,
   }),
 
   user: {
@@ -29,15 +50,14 @@ export const auth = betterAuth({
         type: "string",
         required: true,
         defaultValue: "user",
-        input: false
+        input: false,
       },
       plan: {
         type: "string",
         required: true,
         defaultValue: "freeUser",
-        input: false
-      }
-    }
-  }
-
+        input: false,
+      },
+    },
+  },
 });

@@ -18,6 +18,7 @@ import {
   PlusCircle,
   FolderKanban,
 } from "lucide-react";
+import Logo from "../shared/navbar/Logo";
 
 interface NavItem {
   label: string;
@@ -90,18 +91,13 @@ export default function DashboardSidebar() {
     <div className="flex flex-col h-full">
       {/* Logo / Header */}
       <div
-        className={`flex items-center gap-3 px-4 py-5 border-b border-[#1e293b] ${
-          collapsed ? "justify-center" : ""
+        className={`px-4 py-5 border-b border-[#1e293b] ${
+          collapsed ? "flex justify-center" : ""
         }`}
       >
-        <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#6366f1] to-[#10b981] flex items-center justify-center shrink-0">
-          <Brain size={16} className="text-white" />
+        <div className={collapsed ? "flex justify-center" : ""}>
+          <Logo />
         </div>
-        {!collapsed && (
-          <span className="font-bold text-white text-sm tracking-wide">
-            ZenithMind AI
-          </span>
-        )}
       </div>
 
       {/* Nav Items */}
@@ -225,7 +221,7 @@ export default function DashboardSidebar() {
 
       {/* Desktop Sidebar */}
       <aside
-        className={`relative hidden md:flex flex-col h-screen sticky top-0 bg-[#070f20] border-r border-[#1e293b] transition-all duration-300 ${
+        className={`hidden md:flex flex-col h-screen sticky top-0 bg-[#070f20] border-r border-[#1e293b] transition-all duration-300 ${
           collapsed ? "w-16" : "w-60"
         }`}
       >
