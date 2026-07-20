@@ -2,7 +2,7 @@
 
 import { GetSessionToken } from "./sesstion";
 
-const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") || "/api";
 
 const authHeaders = async (
   requireAuth: boolean = true,

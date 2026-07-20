@@ -39,6 +39,7 @@ export function useVoiceAssistant({
   const voiceRestartTimerRef = useRef<number | null>(null);
   const shouldAutoRestartRef = useRef(false);
   const isRecognitionActiveRef = useRef(false);
+  const restartRecognitionAfterSpeechRef = useRef(false);
   const voiceLanguageRef = useRef("bn-BD");
 
   useEffect(() => {
@@ -58,7 +59,7 @@ export function useVoiceAssistant({
   }, [micMuted]);
   useEffect(() => {
     if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-  
+
     function loadVoices() {
       const voices = window.speechSynthesis.getVoices();
       if (voices.length > 0) {
@@ -66,9 +67,9 @@ export function useVoiceAssistant({
         setVoicesReady(true);
       }
     }
-  
-    loadVoices(); 
-    window.speechSynthesis.onvoiceschanged = loadVoices; 
+
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
     return () => {
       window.speechSynthesis.onvoiceschanged = null;
     };
@@ -97,23 +98,26 @@ export function useVoiceAssistant({
   }
 
   function getPreferredVoice(language: string) {
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) return null;
+    if (typeof window === "undefined" || !("speechSynthesis" in window))
+      return null;
     const voices = cachedVoicesRef.current.length
       ? cachedVoicesRef.current
       : window.speechSynthesis.getVoices();
     const locale = language.toLowerCase();
-  
+
     if (locale.startsWith("bn")) {
       return (
         voices.find((v) => v.lang.toLowerCase().startsWith("bn")) ||
         voices.find((v) => v.lang.toLowerCase().includes("bengali")) ||
         voices.find((v) => v.lang.toLowerCase().includes("bangla")) ||
-        voices.find((v) => v.lang.toLowerCase().startsWith("hi")) ||
-        null 
+        null
       );
     }
     if (locale.startsWith("ar")) {
       return voices.find((v) => v.lang.toLowerCase().startsWith("ar")) || null;
+    }
+    if (locale.startsWith("hi")) {
+      return voices.find((v) => v.lang.toLowerCase().startsWith("hi")) || null;
     }
     return voices.find((v) => v.lang.toLowerCase().startsWith("en")) || null;
   }
@@ -212,6 +216,13 @@ export function useVoiceAssistant({
     }
     if (!text?.trim()) return;
 
+    // If recognition is active, pause it while we speak to avoid feedback.
+    const recognitionWasActive = isRecognitionActiveRef.current;
+    try {
+      // prevent auto-restart behaviour while we intentionally pause
+      shouldAutoRestartRef.current = false;
+      recognitionRef.current?.stop();
+    } catch {}
     stopSpeech();
     const utterance = new SpeechSynthesisUtterance(text.trim());
     utterance.lang = language;
@@ -225,12 +236,15 @@ export function useVoiceAssistant({
       setActiveVoiceMessageId(null);
       setVoicePaused(false);
       activeSpeechRef.current = null;
+      // If recognition was active before speaking, restart it after a short delay.
       if (
+        recognitionWasActive &&
         voiceModeOpenRef.current &&
         !micMutedRef.current &&
         !isStreamingRef.current
       ) {
         window.setTimeout(() => {
+          // small safety check and guarded restart
           if (
             voiceModeOpenRef.current &&
             !micMutedRef.current &&
@@ -347,6 +361,19 @@ export function useVoiceAssistant({
       voiceBufferRef.current = nextText;
       setInput(nextText);
       inputRef.current = nextText;
+
+      // Speak back the newly-finalized segment so the user hears their own input.
+      try {
+        if (
+          voiceModeOpenRef.current &&
+          !micMutedRef.current &&
+          newFinalText.trim()
+        ) {
+          const lang = getSpeechLanguage(newFinalText);
+          // use a short id for user-captured speech
+          speakText(newFinalText, lang, `${Date.now()}-user`);
+        }
+      } catch {}
 
       if (voiceAutoSendTimerRef.current)
         clearTimeout(voiceAutoSendTimerRef.current);
