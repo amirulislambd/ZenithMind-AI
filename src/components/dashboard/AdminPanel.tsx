@@ -2,14 +2,15 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/src/context/AuthContext";
+import { useAdminPanelData, useUpdateAdminUser } from "@/src/lib/api/admin";
 import {
   Users,
   ShieldCheck,
   Activity,
   TrendingUp,
   Search,
-  MoreVertical,
   CheckCircle,
   XCircle,
   Crown,
@@ -17,6 +18,9 @@ import {
   AlertTriangle,
   RefreshCw,
   ChevronDown,
+  Lock,
+  Unlock,
+  UserPlus,
 } from "lucide-react";
 
 // ── Types ───────────────────────────────────────────────────────────────────
@@ -29,6 +33,7 @@ interface AdminUser {
   role: string;
   plan: string;
   emailVerified: boolean;
+  banned: boolean;
   createdAt: string;
 }
 
@@ -71,7 +76,7 @@ function UserAvatar({ user }: { user: AdminUser }) {
   const [imgFailed, setImgFailed] = useState(false);
   const initials = user.name ? user.name.substring(0, 2).toUpperCase() : "U";
   return (
-    <div className="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-br from-[#6366f1] to-[#10b981] flex items-center justify-center shrink-0">
+    <div className="w-8 h-8 rounded-full overflow-hidden bg-linear-to-br from-[#6366f1] to-[#10b981] flex items-center justify-center shrink-0">
       {user.image && !imgFailed ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -121,119 +126,141 @@ function PlanBadge({ plan }: { plan: string }) {
 
 // ── Main Admin Panel ─────────────────────────────────────────────────────────
 
+type ConfirmActionType = "promote" | "demote" | "ban" | "unban";
+
+interface ConfirmAction {
+  userId: string;
+  userName: string;
+  type: ConfirmActionType;
+  label: string;
+  description: string;
+  updates: Record<string, unknown>;
+}
+
 export default function AdminPanel() {
   const { user, isLoading: authLoading } = useAuth();
   const router = useRouter();
+  const { data, isLoading, isError, error, refetch } = useAdminPanelData();
+  const updateUser = useUpdateAdminUser();
 
-  const [users, setUsers] = useState<AdminUser[]>([]);
-  const [fetching, setFetching] = useState(true);
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<"all" | "admin" | "user">("all");
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [confirmAction, setConfirmAction] = useState<ConfirmAction | null>(
+    null,
+  );
 
-  // Guard: redirect non-admins
   useEffect(() => {
     if (!authLoading && user) {
-      const role = (user as any).role;
-      if (role !== "admin") router.push("/dashboard");
-    }
-    if (!authLoading && !user) router.push("/login");
-  }, [user, authLoading, router]);
-
-  // Fetch users from Better Auth API
-  const fetchUsers = useCallback(async () => {
-    setFetching(true);
-    try {
-      const res = await fetch("/api/auth/admin/list-users?limit=100", {
-        credentials: "include",
-      });
-      if (res.ok) {
-        const data = await res.json();
-        // Better Auth returns { users: [...] }
-        const raw: any[] = data.users ?? data ?? [];
-        const mapped: AdminUser[] = raw.map((u: any) => ({
-          id: u.id ?? u._id,
-          name: u.name ?? "Unknown",
-          email: u.email,
-          image: u.image ?? u.imageUrl ?? "",
-          role: u.role ?? "user",
-          plan: u.plan ?? "freeUser",
-          emailVerified: u.emailVerified ?? false,
-          createdAt: u.createdAt ?? new Date().toISOString(),
-        }));
-        setUsers(mapped);
+      if ((user as any).role !== "admin") {
+        router.push("/dashboard");
       }
-    } catch {
-      // silently fail — demo data shown below
-    } finally {
-      setFetching(false);
     }
-  }, []);
+    if (!authLoading && !user) {
+      router.push("/login");
+    }
+  }, [authLoading, router, user]);
 
-  useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
+  const executeConfirmAction = useCallback(async () => {
+    if (!confirmAction) return;
 
-  // Demo fallback if API unavailable
-  const displayUsers =
-    users.length > 0
-      ? users
-      : [
-          {
-            id: "1",
-            name: "Demo Admin",
-            email: "demo@zenithmind.ai",
-            image: "",
-            role: "admin",
-            plan: "premium",
-            emailVerified: true,
-            createdAt: "2026-01-15T10:00:00Z",
-          },
-          {
-            id: "2",
-            name: "Jane Cooper",
-            email: "jane@example.com",
-            image: "",
-            role: "user",
-            plan: "freeUser",
-            emailVerified: true,
-            createdAt: "2026-03-22T08:30:00Z",
-          },
-          {
-            id: "3",
-            name: "Alex Morgan",
-            email: "alex@example.com",
-            image: "",
-            role: "user",
-            plan: "premium",
-            emailVerified: false,
-            createdAt: "2026-05-10T14:45:00Z",
-          },
-          {
-            id: "4",
-            name: "Sam Chen",
-            email: "sam@example.com",
-            image: "",
-            role: "user",
-            plan: "freeUser",
-            emailVerified: true,
-            createdAt: "2026-06-01T09:00:00Z",
-          },
-        ];
+    try {
+      await updateUser.mutateAsync({
+        userId: confirmAction.userId,
+        updates: confirmAction.updates,
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setConfirmAction(null);
+    }
+  }, [confirmAction, updateUser]);
 
-  const filteredUsers = displayUsers.filter((u) => {
-    const matchSearch =
-      u.name.toLowerCase().includes(search.toLowerCase()) ||
-      u.email.toLowerCase().includes(search.toLowerCase());
-    const matchRole = roleFilter === "all" || u.role === roleFilter;
-    return matchSearch && matchRole;
+  const openActionModal = useCallback(
+    (user: AdminUser, type: ConfirmActionType) => {
+      const common = {
+        userId: user.id,
+        userName: user.name,
+      };
+
+      if (type === "ban") {
+        setConfirmAction({
+          ...common,
+          type,
+          label: "Ban user",
+          description: `Are you sure you want to ban ${user.name}? This will prevent them from accessing the platform.`,
+          updates: { banned: true },
+        });
+      } else if (type === "unban") {
+        setConfirmAction({
+          ...common,
+          type,
+          label: "Unban user",
+          description: `Are you sure you want to unban ${user.name}? They will regain access immediately.`,
+          updates: { banned: false },
+        });
+      } else if (type === "promote") {
+        setConfirmAction({
+          ...common,
+          type,
+          label: "Promote to admin",
+          description: `Promote ${user.name} to administrator privileges? This will allow them to manage the platform.`,
+          updates: { role: "admin" },
+        });
+      } else {
+        setConfirmAction({
+          ...common,
+          type,
+          label: "Demote to user",
+          description: `Demote ${user.name} back to a standard user? This will remove their admin privileges.`,
+          updates: { role: "user" },
+        });
+      }
+    },
+    [],
+  );
+
+  const handleToggleBan = useCallback(
+    (user: AdminUser) => {
+      openActionModal(user, user.banned ? "unban" : "ban");
+    },
+    [openActionModal],
+  );
+
+  const handleToggleRole = useCallback(
+    (user: AdminUser) => {
+      openActionModal(user, user.role === "admin" ? "demote" : "promote");
+    },
+    [openActionModal],
+  );
+
+  const users: AdminUser[] =
+    data?.users?.map((item: any) => ({
+      id: item.id,
+      name: item.name,
+      email: item.email,
+      image: item.image,
+      role: item.role,
+      plan: item.plan,
+      emailVerified: item.emailVerified,
+      banned: item.banned ?? false,
+      createdAt: item.createdAt,
+    })) ?? [];
+
+  const filteredUsers = users.filter((u) => {
+    const normalized = search.toLowerCase();
+    const matchesSearch =
+      u.name.toLowerCase().includes(normalized) ||
+      u.email.toLowerCase().includes(normalized);
+    const matchesRole = roleFilter === "all" || u.role === roleFilter;
+    return matchesSearch && matchesRole;
   });
 
   const stats = {
-    total: displayUsers.length,
-    admins: displayUsers.filter((u) => u.role === "admin").length,
-    premium: displayUsers.filter((u) => u.plan === "premium").length,
-    verified: displayUsers.filter((u) => u.emailVerified).length,
+    total: data?.stats?.totalUsers ?? "0",
+    admins: data?.stats?.admins ?? "0",
+    premium: data?.stats?.premium ?? "0",
+    verified: data?.stats?.verified ?? "0",
   };
 
   if (authLoading) {
@@ -301,9 +328,7 @@ export default function AdminPanel() {
       <div className="bg-[#0b1120] border border-[#1e293b] rounded-2xl overflow-hidden">
         {/* Table Header / Controls */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 border-b border-[#1e293b]">
-          <h2 className="text-sm font-semibold text-white">
-            Registered Users
-          </h2>
+          <h2 className="text-sm font-semibold text-white">Registered Users</h2>
           <div className="flex items-center gap-2">
             {/* Search */}
             <div className="relative">
@@ -339,7 +364,7 @@ export default function AdminPanel() {
             </div>
             {/* Refresh */}
             <button
-              onClick={fetchUsers}
+              onClick={() => refetch()}
               className="p-1.5 rounded-lg border border-[#1e293b] text-[#64748b] hover:text-white hover:border-[#273448] transition-colors"
               title="Refresh"
             >
@@ -349,7 +374,7 @@ export default function AdminPanel() {
         </div>
 
         {/* Table Body */}
-        {fetching ? (
+        {isLoading ? (
           <div className="flex items-center justify-center py-16">
             <Loader2 className="h-6 w-6 text-[#6366f1] animate-spin" />
           </div>
@@ -365,84 +390,100 @@ export default function AdminPanel() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-[#1e293b]">
-                    {["User", "Email", "Role", "Plan", "Verified", "Joined", "Actions"].map(
-                      (h, i) => (
-                        <th
-                          key={i}
-                          className="px-5 py-3 text-left text-[10px] font-semibold text-[#475569] uppercase tracking-wider"
-                        >
-                          {h === "Actions" ? "" : h}
-                        </th>
-                      )
-                    )}
+                    {[
+                      "User",
+                      "Email",
+                      "Role",
+                      "Plan",
+                      "Verified",
+                      "Joined",
+                      "Actions",
+                    ].map((h, i) => (
+                      <th
+                        key={i}
+                        className="px-5 py-3 text-left text-[10px] font-semibold text-[#475569] uppercase tracking-wider"
+                      >
+                        {h === "Actions" ? "" : h}
+                      </th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#0d1627]">
-                  {filteredUsers.map((u) => (
-                    <tr
-                      key={u.id}
-                      className="hover:bg-[#0d1428] transition-colors group"
-                    >
-                      <td className="px-5 py-3.5">
-                        <div className="flex items-center gap-2.5">
-                          <UserAvatar user={u} />
-                          <span className="font-medium text-[#e2e8f0] truncate max-w-[120px]">
-                            {u.name}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-5 py-3.5 text-[#94a3b8] text-xs">
-                        {u.email}
-                      </td>
-                      <td className="px-5 py-3.5">
-                        <RoleBadge role={u.role} />
-                      </td>
-                      <td className="px-5 py-3.5">
-                        <PlanBadge plan={u.plan} />
-                      </td>
-                      <td className="px-5 py-3.5">
-                        {u.emailVerified ? (
-                          <CheckCircle size={16} className="text-[#10b981]" />
-                        ) : (
-                          <XCircle size={16} className="text-red-400" />
-                        )}
-                      </td>
-                      <td className="px-5 py-3.5 text-xs text-[#64748b]">
-                        {new Date(u.createdAt).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })}
-                      </td>
-                      <td className="px-5 py-3.5">
-                        <div className="relative">
-                          <button
-                            onClick={() =>
-                              setOpenMenuId(
-                                openMenuId === u.id ? null : u.id
-                              )
-                            }
-                            className="p-1.5 rounded-lg text-[#475569] hover:text-white hover:bg-[#1e293b] transition-colors opacity-0 group-hover:opacity-100"
-                          >
-                            <MoreVertical size={14} />
-                          </button>
-                          {openMenuId === u.id && (
-                            <div className="absolute right-0 mt-1 w-36 bg-[#0b1120] border border-[#1e293b] rounded-xl shadow-xl z-10 overflow-hidden">
-                              <button className="w-full text-left px-4 py-2.5 text-xs text-[#e2e8f0] hover:bg-[#1e293b] transition-colors">
-                                View Profile
-                              </button>
-                              <button className="w-full text-left px-4 py-2.5 text-xs text-amber-400 hover:bg-[#1e293b] transition-colors">
-                                Make Admin
-                              </button>
-                              <button className="w-full text-left px-4 py-2.5 text-xs text-red-400 hover:bg-red-500/10 transition-colors">
-                                Suspend User
-                              </button>
-                            </div>
+                  <AnimatePresence mode="popLayout">
+                    {filteredUsers.map((u) => (
+                      <motion.tr
+                        key={u.id}
+                        layout
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -12 }}
+                        transition={{ duration: 0.25 }}
+                        className="hover:bg-[#0d1428] transition-colors group"
+                      >
+                        <td className="px-5 py-3.5">
+                          <div className="flex items-center gap-2.5">
+                            <UserAvatar user={u} />
+                            <span className="font-medium text-[#e2e8f0] truncate max-w-30">
+                              {u.name}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-5 py-3.5 text-[#94a3b8] text-xs">
+                          {u.email}
+                        </td>
+                        <td className="px-5 py-3.5">
+                          <RoleBadge role={u.role} />
+                        </td>
+                        <td className="px-5 py-3.5">
+                          <PlanBadge plan={u.plan} />
+                        </td>
+                        <td className="px-5 py-3.5">
+                          {u.emailVerified ? (
+                            <CheckCircle size={16} className="text-[#10b981]" />
+                          ) : (
+                            <XCircle size={16} className="text-red-400" />
                           )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                        </td>
+                        <td className="px-5 py-3.5 text-xs text-[#64748b]">
+                          {new Date(u.createdAt).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })}
+                        </td>
+                        <td className="px-5 py-3.5">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => handleToggleBan(u)}
+                              disabled={updateUser.isPending}
+                              className="inline-flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-sm font-medium text-slate-200 transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                            >
+                              {u.banned ? (
+                                <Unlock size={15} />
+                              ) : (
+                                <Lock size={15} />
+                              )}
+                              {u.banned ? "Unban" : "Ban"}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleToggleRole(u)}
+                              disabled={updateUser.isPending}
+                              className={`inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-60 ${
+                                u.role === "admin"
+                                  ? "border-rose-500/20 bg-rose-500/10 text-rose-200 hover:bg-rose-500/20"
+                                  : "border-amber-500/20 bg-amber-500/10 text-amber-200 hover:bg-amber-500/20"
+                              }`}
+                            >
+                              <UserPlus size={15} />
+                              {u.role === "admin" ? "Demote" : "Promote"}
+                            </button>
+                          </div>
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </AnimatePresence>
                 </tbody>
               </table>
             </div>
@@ -450,7 +491,10 @@ export default function AdminPanel() {
             {/* Mobile card list */}
             <div className="md:hidden divide-y divide-[#0d1627]">
               {filteredUsers.map((u) => (
-                <div key={u.id} className="p-4 hover:bg-[#0d1428] transition-colors">
+                <div
+                  key={u.id}
+                  className="p-4 hover:bg-[#0d1428] transition-colors"
+                >
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
                       <UserAvatar user={u} />
@@ -480,6 +524,30 @@ export default function AdminPanel() {
                       })}
                     </span>
                   </div>
+                  <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                    <button
+                      type="button"
+                      onClick={() => handleToggleBan(u)}
+                      disabled={updateUser.isPending}
+                      className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-sm font-medium text-slate-200 transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {u.banned ? <Unlock size={15} /> : <Lock size={15} />}
+                      {u.banned ? "Unban" : "Ban"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleToggleRole(u)}
+                      disabled={updateUser.isPending}
+                      className={`inline-flex items-center justify-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-60 ${
+                        u.role === "admin"
+                          ? "border-rose-500/20 bg-rose-500/10 text-rose-200 hover:bg-rose-500/20"
+                          : "border-amber-500/20 bg-amber-500/10 text-amber-200 hover:bg-amber-500/20"
+                      }`}
+                    >
+                      <UserPlus size={15} />
+                      {u.role === "admin" ? "Demote" : "Promote"}
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -489,13 +557,65 @@ export default function AdminPanel() {
         {/* Footer */}
         <div className="px-5 py-3 border-t border-[#1e293b] flex items-center justify-between">
           <p className="text-xs text-[#475569]">
-            Showing {filteredUsers.length} of {displayUsers.length} users
+            Showing {filteredUsers.length} of {users.length} users
           </p>
           <p className="text-xs text-[#475569]">
-            {users.length === 0 ? "Demo data — API not connected" : "Live data"}
+            {data ? "Live data" : "Loading..."}
           </p>
         </div>
       </div>
+
+      <AnimatePresence>
+        {confirmAction && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="w-full max-w-lg rounded-3xl border border-[#1e293b] bg-[#020815] p-6 shadow-2xl shadow-slate-950/60"
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <div className="mb-5">
+                <h2 className="text-xl font-semibold text-white">
+                  {confirmAction.label}
+                </h2>
+                <p className="mt-2 text-sm text-[#94a3b8]">
+                  {confirmAction.description}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-[#0f172a] bg-[#0b1120] p-4 text-sm text-neutral-dark">
+                <p className="font-semibold text-white">Target user</p>
+                <p className="mt-1">{confirmAction.userName}</p>
+                <p className="mt-2 text-xs text-[#64748b]">
+                  Action type: {confirmAction.type}
+                </p>
+              </div>
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+                <button
+                  type="button"
+                  onClick={() => setConfirmAction(null)}
+                  className="rounded-2xl border border-[#1e293b] px-4 py-2 text-sm font-medium text-[#94a3b8] transition hover:border-slate-500 hover:text-white"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={executeConfirmAction}
+                  disabled={updateUser.isPending}
+                  className="rounded-2xl bg-[#10b981] px-4 py-2 text-sm font-semibold text-black transition hover:bg-[#22c55e] disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {updateUser.isPending ? "Processing..." : "Confirm"}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

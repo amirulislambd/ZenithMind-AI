@@ -1,28 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GetSessionToken } from "@/src/lib/core/sesstion";
 
-const BACKEND_API =
-  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
-  "http://localhost:5000/api";
+const BACKEND_API = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") || "http://localhost:5000/api";
 
-export async function POST(req: NextRequest) {
+export async function GET(req: NextRequest) {
   const token = await GetSessionToken();
-  const body = await req.formData();
 
-  const response = await fetch(`${BACKEND_API}/ai/analyze`, {
-    method: "POST",
+  const response = await fetch(`${BACKEND_API}/dashboard/user-stats`, {
+    method: "GET",
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
-    body,
   });
 
   const data = await response.text();
   return new NextResponse(data, {
     status: response.status,
     headers: {
-      "Content-Type":
-        response.headers.get("content-type") || "application/json",
+      "Content-Type": response.headers.get("content-type") || "application/json",
     },
   });
 }
