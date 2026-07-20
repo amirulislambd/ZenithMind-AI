@@ -80,11 +80,25 @@ export async function analyzeCSV(file: File) {
     credentials: 'include',
     body: fd,
   });
+
   if (!res.ok) {
     const text = await res.text();
     throw new Error(text || 'Analyze failed');
   }
-  return res.json();
+
+  const payload = await res.json();
+  if (
+    payload &&
+    typeof payload === "object" &&
+    ("success" in payload || "data" in payload)
+  ) {
+    if (payload.success === false) {
+      throw new Error(payload.error || "Analyze failed");
+    }
+    return payload.data ?? payload;
+  }
+
+  return payload;
 }
 
 export async function getChatHistory() {
