@@ -8,3 +8,8 @@ export interface IChatSession {
   userId: string;
   messages: IMessage[];
 }
+export interface PlanStep {
+  title: string;
+  detail: string;
+}
+ 

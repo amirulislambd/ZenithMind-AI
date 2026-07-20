@@ -38,21 +38,20 @@ export default function AnalyzePage() {
       });
     }
 
-    async function getLib(name: string, cdn: string, globalVar: string) {
-      try {
-        // use variable import to avoid bundler static resolution
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const mod: any = await import(name as any);
-        return mod?.default || mod;
-      } catch (e) {
-        await loadScript(cdn);
-        // @ts-ignore
-        return (window as any)[globalVar];
-      }
+    async function getLib(cdn: string, globalVar: string) {
+      await loadScript(cdn);
+      // @ts-ignore
+      return (window as any)[globalVar];
     }
 
-    const jsPDFLib = await getLib('jspdf', 'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js', 'jspdf');
-    const html2canvasLib = await getLib('html2canvas', 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js', 'html2canvas');
+    const jsPDFLib = await getLib(
+      "https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js",
+      "jspdf",
+    );
+    const html2canvasLib = await getLib(
+      "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js",
+      "html2canvas",
+    );
 
     if (!containerRef.current) return;
 
