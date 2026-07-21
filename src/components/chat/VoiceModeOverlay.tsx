@@ -10,6 +10,7 @@ export default function VoiceModeOverlay({
   voicePaused,
   activeVoiceMessageId,
   micMuted,
+  liveTranscript,
   onClose,
   onToggleMuteMic,
   onTogglePauseVoice,
@@ -20,6 +21,7 @@ export default function VoiceModeOverlay({
   voicePaused: boolean;
   activeVoiceMessageId: string | null;
   micMuted: boolean;
+  liveTranscript?: string;
   onClose: () => void;
   onToggleMuteMic: () => void;
   onTogglePauseVoice: () => void;
@@ -41,23 +43,23 @@ export default function VoiceModeOverlay({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-60 flex items-center justify-center bg-slate-950/80 px-4 py-6 backdrop-blur-xl"
+          className="fixed inset-0 z-60 flex items-center justify-center bg-slate-950/80 px-2 py-4 backdrop-blur-xl sm:px-4 sm:py-6"
         >
           <motion.div
             initial={{ scale: 0.96, y: 20, opacity: 0 }}
             animate={{ scale: 1, y: 0, opacity: 1 }}
             exit={{ scale: 0.96, y: 20, opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="relative flex h-full max-h-190 w-full max-w-4xl flex-col overflow-hidden rounded-[32px] border border-white/10 bg-slate-900/85 shadow-2xl shadow-black/50"
+            className="relative flex h-full max-h-190 w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-900/85 shadow-2xl shadow-black/50 sm:rounded-[32px]"
           >
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.28),transparent_45%),radial-gradient(circle_at_bottom,rgba(16,185,129,0.2),transparent_40%)]" />
 
-            <div className="relative flex items-center justify-between border-b border-white/10 px-6 py-4">
+            {/* <div className="relative flex items-center justify-between border-b border-white/10 px-4 py-3 sm:px-6 sm:py-4">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-indigo-300">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-indigo-300 sm:text-sm">
                   Voice Mode
                 </p>
-                <h3 className="mt-1 text-xl font-semibold text-white">
+                <h3 className="mt-1 text-base font-semibold text-white sm:text-xl">
                   Conversational AI, now hands-free
                 </h3>
               </div>
@@ -68,9 +70,9 @@ export default function VoiceModeOverlay({
               >
                 <X className="h-5 w-5" />
               </button>
-            </div>
+            </div> */}
 
-            <div className="relative flex flex-1 flex-col items-center justify-center px-6 py-8 text-center">
+            <div className="relative flex flex-1 flex-col items-center justify-center px-4 py-6 text-center sm:px-6 sm:py-8">
               <motion.div
                 animate={
                   isListening
@@ -103,28 +105,38 @@ export default function VoiceModeOverlay({
                           }
                         : { scale: 1 }
                 }
-                transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
-                className="mb-8 flex h-44 w-44 items-center justify-center rounded-full border border-white/10 bg-linear-to-br from-indigo-500/40 via-slate-900 to-emerald-400/40 shadow-2xl"
+                transition={{
+                  duration: 1.6,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="mb-6 flex h-28 w-28 items-center justify-center rounded-full border border-white/10 bg-linear-to-br from-indigo-500/40 via-slate-900 to-emerald-400/40 shadow-2xl sm:mb-8 sm:h-44 sm:w-44"
               >
-                <div className="flex h-28 w-28 items-center justify-center rounded-full border border-white/15 bg-slate-950/70 text-white">
+                <div className="flex h-18 w-18 items-center justify-center rounded-full border border-white/15 bg-slate-950/70 text-white sm:h-28 sm:w-28">
                   {isListening ? (
-                    <Mic className="h-11 w-11 text-rose-300" />
+                    <Mic className="h-8 w-8 text-rose-300 sm:h-11 sm:w-11" />
                   ) : typingActive ? (
-                    <Brain className="h-11 w-11 text-indigo-200" />
+                    <Brain className="h-8 w-8 text-indigo-200 sm:h-11 sm:w-11" />
                   ) : activeVoiceMessageId ? (
-                    <Speaker className="h-11 w-11 text-emerald-200" />
+                    <Speaker className="h-8 w-8 text-emerald-200 sm:h-11 sm:w-11" />
                   ) : (
-                    <Sparkles className="h-11 w-11 text-indigo-200" />
+                    <Sparkles className="h-8 w-8 text-indigo-200 sm:h-11 sm:w-11" />
                   )}
                 </div>
               </motion.div>
 
-              <div className="mb-6 flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-200">
+              <div className="mb-4 flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-200 sm:mb-6">
                 <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
                 <span>{voiceOverlayState}</span>
               </div>
 
-              <div className="flex items-end justify-center gap-1.5">
+              {liveTranscript && (
+                <p className="mb-4 max-w-md text-sm text-slate-300 sm:mb-6">
+                  “{liveTranscript}”
+                </p>
+              )}
+
+              <div className="flex items-end justify-center gap-1 sm:gap-1.5">
                 {Array.from({ length: 6 }).map((_, idx) => (
                   <motion.div
                     key={idx}
@@ -137,19 +149,23 @@ export default function VoiceModeOverlay({
                             ? { scaleY: [0.6, 1.1, 0.6, 1.1] }
                             : { scaleY: [0.6, 0.8, 0.6] }
                     }
-                    transition={{ duration: 0.9, repeat: Infinity, delay: idx * 0.08 }}
-                    className="w-2 rounded-full bg-linear-to-t from-indigo-500 to-emerald-400"
-                    style={{ height: 18 + idx * 7 }}
+                    transition={{
+                      duration: 0.9,
+                      repeat: Infinity,
+                      delay: idx * 0.08,
+                    }}
+                    className="w-1.5 rounded-full bg-linear-to-t from-indigo-500 to-emerald-400 sm:w-2"
+                    style={{ height: 14 + idx * 5 }}
                   />
                 ))}
               </div>
             </div>
 
-            <div className="relative flex flex-wrap items-center justify-center gap-3 border-t border-white/10 px-6 py-4">
+            <div className="relative flex flex-wrap items-center justify-center gap-2 border-t border-white/10 px-4 py-3 sm:gap-3 sm:px-6 sm:py-4">
               <button
                 type="button"
                 onClick={onToggleMuteMic}
-                className={`rounded-full border px-4 py-2 text-sm transition-all ${
+                className={`rounded-full border px-3 py-2 text-xs transition-all sm:px-4 sm:text-sm ${
                   micMuted
                     ? "border-amber-400/30 bg-amber-500/15 text-amber-100"
                     : "border-white/10 bg-white/5 text-slate-200 hover:border-white/20 hover:bg-white/10"
@@ -160,25 +176,25 @@ export default function VoiceModeOverlay({
               <button
                 type="button"
                 onClick={onTogglePauseVoice}
-                className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-200 transition-all hover:border-white/20 hover:bg-white/10"
+                className="rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs text-slate-200 transition-all hover:border-white/20 hover:bg-white/10 sm:px-4 sm:text-sm"
               >
                 {voicePaused ? (
-                  <span className="inline-flex items-center gap-2">
-                    <Play className="h-4 w-4" /> Resume Voice
+                  <span className="inline-flex items-center gap-1.5 sm:gap-2">
+                    <Play className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Resume
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-2">
-                    <Pause className="h-4 w-4" /> Pause Voice
+                  <span className="inline-flex items-center gap-1.5 sm:gap-2">
+                    <Pause className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Pause
                   </span>
                 )}
               </button>
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-full border border-rose-400/20 bg-rose-500/10 px-4 py-2 text-sm text-rose-100 transition-all hover:bg-rose-500/20"
+                className="rounded-full border border-rose-400/20 bg-rose-500/10 px-3 py-2 text-xs text-rose-100 transition-all hover:bg-rose-500/20 sm:px-4 sm:text-sm"
               >
-                <span className="inline-flex items-center gap-2">
-                  <X className="h-4 w-4" /> Exit Voice Mode
+                <span className="inline-flex items-center gap-1.5 sm:gap-2">
+                  <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Exit
                 </span>
               </button>
             </div>

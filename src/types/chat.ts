@@ -1,7 +1,7 @@
 export interface IMessage {
-  role: 'user' | 'model';
+  role: "user" | "assistant" | "model";
   content: string;
-  timestamp: string; // ISO
+  timestamp?: number | string;
 }
 
 export interface IChatSession {
@@ -12,4 +12,3 @@ export interface PlanStep {
   title: string;
   detail: string;
 }
- 

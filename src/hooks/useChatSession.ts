@@ -1,14 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { streamChat, getChatHistory, clearChatHistory } from "../lib/api/ai";
-import type { IMessage, PlanStep } from "../types/chat";
+import { streamChat, getChatHistory, clearChatHistory } from "@/src/lib/api/ai";
+import type { IMessage, PlanStep } from "@/src/types/chat";
 
 interface UseChatSessionOptions {
-  onAssistantReply?: (fullText: string) => void;
+  onAssistantReply?: (fullText: string, viaVoice: boolean) => void;
 }
 
-export function useChatSession({ onAssistantReply }: UseChatSessionOptions = {}) {
+export function useChatSession({
+  onAssistantReply,
+}: UseChatSessionOptions = {}) {
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
   const [typingActive, setTypingActive] = useState(false);
@@ -30,7 +32,11 @@ export function useChatSession({ onAssistantReply }: UseChatSessionOptions = {})
         if (!mounted) return;
         if (Array.isArray(res)) {
           setMessages(
-            res.map((m: any) => ({ role: m.role, content: m.content, timestamp: m.timestamp })),
+            res.map((m: any) => ({
+              role: m.role,
+              content: m.content,
+              timestamp: m.timestamp,
+            })),
           );
         }
       })
@@ -50,11 +56,19 @@ export function useChatSession({ onAssistantReply }: UseChatSessionOptions = {})
     setClearing(false);
   }
 
-  async function handleSend(text: string) {
+  // `viaVoice` = true only when this message originated from the Voice Mode
+  // conversation window. It determines whether the reply gets spoken aloud.
+  async function handleSend(text: string, viaVoice: boolean = false) {
     const trimmed = text.trim();
     if (!trimmed || isStreaming) return;
 
-    const historySnapshot = messagesRef.current.slice(-8);
+    // Sanitize and snapshot the recent conversation history to avoid context leakage
+    const historySnapshot = messagesRef.current.slice(-8).map((m) => ({
+      role: m.role,
+      content: m.content,
+      timestamp: m.timestamp,
+    }));
+
     const userMsg: IMessage = {
       role: "user",
       content: trimmed,
@@ -65,7 +79,11 @@ export function useChatSession({ onAssistantReply }: UseChatSessionOptions = {})
       const withUser = [...prev, userMsg];
       const withPlaceholder = [
         ...withUser,
-        { role: "model" as const, content: "", timestamp: new Date().toISOString() },
+        {
+          role: "model" as const,
+          content: "",
+          timestamp: new Date().toISOString(),
+        },
       ];
       assistantIdxRef.current = withPlaceholder.length - 1;
       return withPlaceholder;
@@ -99,7 +117,7 @@ export function useChatSession({ onAssistantReply }: UseChatSessionOptions = {})
         }
       }
 
-      if (fullText.trim()) onAssistantReply?.(fullText);
+      if (fullText.trim()) onAssistantReply?.(fullText, viaVoice);
     } catch (err) {
       console.error("Chat stream error:", err);
       const idx = assistantIdxRef.current;
@@ -108,7 +126,9 @@ export function useChatSession({ onAssistantReply }: UseChatSessionOptions = {})
         const updated = [...prev];
         updated[idx] = {
           ...updated[idx],
-          content: fullText || "Sorry — the AI is temporarily unavailable. Please try again.",
+          content:
+            fullText ||
+            "Sorry — the AI is temporarily unavailable. Please try again.",
         };
         return updated;
       });

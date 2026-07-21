@@ -1,4 +1,5 @@
 import type { IMessage } from '@/src/types/chat';
+import { buildLanguageInstruction } from "@/src/lib/language";
 
 export type SseChunkEvent = { chunk: string };
 export type SseDoneEvent = {
@@ -18,11 +19,27 @@ export async function* streamChat(
   message: string,
   history: IMessage[] = [],
 ): AsyncGenerator<SseEvent> {
-  const res = await fetch('/api/ai/chat', {
-    method: 'POST',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message, history }),
+  const systemInstruction = buildLanguageInstruction();
+  const normalizedHistory = history.map((item) => ({
+    role: item.role === "model" ? "assistant" : item.role,
+    content: item.content,
+  }));
+
+  const payload = {
+    message,
+    history: normalizedHistory,
+    messages: [
+      { role: "system", content: systemInstruction },
+      ...normalizedHistory,
+      { role: "user", content: message },
+    ],
+  };
+
+  const res = await fetch("/api/ai/chat", {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
   });
 
   if (!res.ok || !res.body) {
@@ -31,7 +48,7 @@ export async function* streamChat(
 
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
-  let buffer = '';
+  let buffer = "";
 
   while (true) {
     const { value, done } = await reader.read();
@@ -40,16 +57,16 @@ export async function* streamChat(
     buffer += decoder.decode(value, { stream: true });
 
     // SSE frames are separated by double newlines
-    const frames = buffer.split('\n\n');
+    const frames = buffer.split("\n\n");
     // keep the last (possibly incomplete) frame in the buffer
-    buffer = frames.pop() ?? '';
+    buffer = frames.pop() ?? "";
 
     for (const frame of frames) {
       // Each frame may have multiple lines; we care about "data: ..." lines
-      for (const line of frame.split('\n')) {
-        if (!line.startsWith('data:')) continue;
+      for (const line of frame.split("\n")) {
+        if (!line.startsWith("data:")) continue;
         const raw = line.slice(5).trim();
-        if (raw === '[DONE]') return; // sentinel — stop iteration
+        if (raw === "[DONE]") return; // sentinel — stop iteration
         try {
           yield JSON.parse(raw) as SseEvent;
         } catch {

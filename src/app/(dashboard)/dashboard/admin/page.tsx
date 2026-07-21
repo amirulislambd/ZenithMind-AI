@@ -8,11 +8,7 @@ export const metadata: Metadata = {
   description: "Admin management panel for ZenithMind AI platform",
 };
 
-export default async function AdminPage() {
-
-  const session = await getSession();
-  console.log('session', session)
-
+export default function AdminPage() {
 
   return <AdminPanel />;
 }
