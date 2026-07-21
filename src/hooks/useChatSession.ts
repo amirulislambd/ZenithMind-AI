@@ -47,13 +47,20 @@ export function useChatSession({
   }, []);
 
   async function handleClear() {
-    if (!confirm("Clear all chat history? This cannot be undone.")) return;
-    setClearing(true);
-    await clearChatHistory();
-    setMessages([]);
-    setFollowUps([]);
-    setPlan([]);
-    setClearing(false);
+    try {
+      setClearing(true);
+
+      await clearChatHistory();
+
+      setMessages([]);
+      setFollowUps([]);
+      setPlan([]);
+    } catch (error) {
+      console.error("Clear chat error:", error);
+      throw error;
+    } finally {
+      setClearing(false);
+    }
   }
 
   // `viaVoice` = true only when this message originated from the Voice Mode
