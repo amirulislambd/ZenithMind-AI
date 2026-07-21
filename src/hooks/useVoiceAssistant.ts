@@ -11,9 +11,12 @@ type RecognitionLanguage = "bn-BD" | "ar-SA" | "en-US" | "ur-PK";
 export function useVoiceAssistant({ setInput }: UseVoiceAssistantOptions) {
   const [isListening, setIsListening] = useState(false);
   const [voiceError, setVoiceError] = useState<string | null>(null);
+
   const [selectedLanguage, setSelectedLanguage] =
     useState<RecognitionLanguage>("bn-BD");
+
   const recognitionRef = useRef<any>(null);
+
   const finalTranscriptRef = useRef("");
   const lastInterimRef = useRef("");
   const draftTranscriptRef = useRef("");
@@ -33,54 +36,67 @@ export function useVoiceAssistant({ setInput }: UseVoiceAssistantOptions) {
     }
 
     const recognition = new SpeechRecognitionCtor();
+
     recognition.continuous = true;
     recognition.interimResults = true;
     recognition.lang = selectedLanguage;
 
     const appendTranscript = (value: string, isInterim = false) => {
       const normalizedValue = value.replace(/\s+/g, " ").trim();
+
       if (!normalizedValue) return;
 
-      setInput((current) => {
-        const currentText = current.trim().replace(/\s+/g, " ");
-        if (!currentText) return normalizedValue;
+      // Interim speech
+      if (isInterim) {
+        setInput(() => {
+          const base = finalTranscriptRef.current;
 
-        const normalizedCurrent = currentText.replace(/\s+/g, " ");
-        if (normalizedCurrent === normalizedValue) {
-          return normalizedCurrent;
-        }
+          if (!base) {
+            return normalizedValue;
+          }
 
-        if (
-          normalizedCurrent
-            .toLowerCase()
-            .endsWith(normalizedValue.toLowerCase())
-        ) {
-          return normalizedCurrent;
-        }
+          if (normalizedValue.toLowerCase().startsWith(base.toLowerCase())) {
+            return normalizedValue;
+          }
 
-        if (
-          normalizedValue
-            .toLowerCase()
-            .endsWith(normalizedCurrent.toLowerCase())
-        ) {
-          return normalizedValue;
-        }
+          return `${base} ${normalizedValue}`.trim();
+        });
 
-        if (isInterim) {
-          return normalizedValue;
-        }
+        return;
+      }
 
-        return `${normalizedCurrent} ${normalizedValue}`.trim();
-      });
+      // Final speech
+      const currentFinal = finalTranscriptRef.current;
 
-      if (!isInterim) {
+      if (!currentFinal) {
         finalTranscriptRef.current = normalizedValue;
         draftTranscriptRef.current = normalizedValue;
+
+        setInput(normalizedValue);
+        return;
       }
+
+      if (
+        normalizedValue.toLowerCase().startsWith(currentFinal.toLowerCase())
+      ) {
+        finalTranscriptRef.current = normalizedValue;
+        draftTranscriptRef.current = normalizedValue;
+
+        setInput(normalizedValue);
+        return;
+      }
+
+      const merged = `${currentFinal} ${normalizedValue}`.trim();
+
+      finalTranscriptRef.current = merged;
+      draftTranscriptRef.current = merged;
+
+      setInput(merged);
     };
 
     recognition.onresult = (event: any) => {
       const latestResult = event.results?.[event.results.length - 1];
+
       const transcript = latestResult?.[0]?.transcript ?? "";
 
       if (!transcript.trim()) return;
@@ -89,6 +105,7 @@ export function useVoiceAssistant({ setInput }: UseVoiceAssistantOptions) {
 
       if (latestResult?.isFinal) {
         appendTranscript(normalizedTranscript, false);
+
         lastInterimRef.current = "";
         return;
       }
@@ -98,6 +115,7 @@ export function useVoiceAssistant({ setInput }: UseVoiceAssistantOptions) {
         normalizedTranscript !== lastInterimRef.current
       ) {
         lastInterimRef.current = normalizedTranscript;
+
         appendTranscript(normalizedTranscript, true);
       }
     };
@@ -123,6 +141,7 @@ export function useVoiceAssistant({ setInput }: UseVoiceAssistantOptions) {
 
     recognition.onend = () => {
       setIsListening(false);
+
       if (recognitionRef.current) {
         recognitionRef.current.lang = selectedLanguage;
       }
@@ -144,26 +163,42 @@ export function useVoiceAssistant({ setInput }: UseVoiceAssistantOptions) {
       try {
         recognitionRef.current.stop();
       } catch {}
+
       setIsListening(false);
       lastInterimRef.current = "";
     } else {
       try {
         setVoiceError(null);
+
+        // NEW SESSION START
+        draftTranscriptRef.current = "";
+        finalTranscriptRef.current = "";
         lastInterimRef.current = "";
+
         if (recognitionRef.current) {
           recognitionRef.current.lang = selectedLanguage;
         }
+
         recognitionRef.current.start();
       } catch (err) {
         console.error("Mic start exception:", err);
+
         try {
           recognitionRef.current.abort();
+
           setTimeout(() => {
             recognitionRef.current.start();
           }, 200);
         } catch {}
       }
     }
+  }
+  function clearVoiceDraft() {
+    draftTranscriptRef.current = "";
+    finalTranscriptRef.current = "";
+    lastInterimRef.current = "";
+
+    setInput("");
   }
 
   return {
@@ -172,5 +207,6 @@ export function useVoiceAssistant({ setInput }: UseVoiceAssistantOptions) {
     selectedLanguage,
     setSelectedLanguage,
     toggleListening,
+    clearVoiceDraft,
   };
 }
