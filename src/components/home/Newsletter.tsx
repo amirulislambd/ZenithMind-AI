@@ -1,23 +1,38 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { motion } from "framer-motion";
+import {
+  ArrowRight,
+  CheckCircle2,
+  Mail,
+  ShieldCheck,
+  Clock3,
+  Sparkles,
+} from "lucide-react";
 
 export default function Newsletter() {
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [status, setStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
+
     setStatus("loading");
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
+
       await fetch("/api/newsletter", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ email }),
       });
+
       setStatus("success");
       setEmail("");
     } catch {
@@ -26,58 +41,338 @@ export default function Newsletter() {
   };
 
   return (
-    <section className="bg-[#0f172a] px-4 py-12 md:px-8 md:py-20 lg:px-16">
-      <div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-linear-to-br from-[#1e293b] to-[#0f172a] p-8 text-white md:p-10 lg:p-14">
-        <div className="grid gap-8 lg:grid-cols-[1fr_0.9fr] lg:items-center">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#93c5fd]">
-              Join ZenithCircle
-            </p>
-            <h2 className="mt-3 text-3xl font-semibold md:text-4xl">
-              Receive practical recovery insights before your calendar gets crowded.
-            </h2>
-            <p className="mt-5 max-w-xl text-lg leading-8 text-slate-300">
-              Get thoughtful reflections on burnout prevention, focus, and sustainable performance delivered with clarity.
-            </p>
-          </div>
+    <section className="bg-[#0b1020] px-4 py-14 md:px-8 md:py-20 lg:px-16">
+      <div
+        className="
+          mx-auto
+          max-w-7xl
+          overflow-hidden
+          rounded-[36px]
+          border
+          border-white/10
+          bg-gradient-to-br
+          from-[#181924]
+          to-[#11131d]
+          p-8
+          shadow-[0_25px_80px_rgba(0,0,0,0.35)]
 
-          <form onSubmit={handleSubmit} className="rounded-3xl border border-white/10 bg-white/10 p-6 backdrop-blur">
-            <label htmlFor="email" className="text-sm font-medium text-slate-200">
-              Work email
+          md:p-12
+        "
+      >
+        <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
+          {/* Left */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+          >
+            <div
+              className="
+                inline-flex
+                items-center
+                gap-2
+                rounded-full
+                border
+                border-sky-500/20
+                bg-sky-500/10
+                px-5
+                py-2
+                text-sm
+                font-semibold
+                text-sky-400
+              "
+            >
+              <Mail size={16} />
+              Join ZenithCircle
+            </div>
+
+            <h2
+              className="
+                mt-8
+                max-w-xl
+                text-5xl
+                font-bold
+                leading-tight
+                text-white
+              "
+            >
+              Stay one step ahead of burnout.
+            </h2>
+
+            <p
+              className="
+                mt-6
+                max-w-xl
+                text-lg
+                leading-9
+                text-slate-400
+              "
+            >
+              Join thousands of professionals receiving practical AI-powered
+              wellbeing insights, productivity strategies and mental recovery
+              tips every week.
+            </p>
+          </motion.div>
+
+          {/* Form */}
+          <motion.form
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.15, duration: 0.6 }}
+            viewport={{ once: true }}
+            onSubmit={handleSubmit}
+            className="
+              rounded-[32px]
+              border
+              border-white/10
+              bg-white/10
+              p-8
+              backdrop-blur-xl
+              shadow-2xl
+            "
+          >
+            <label
+              htmlFor="email"
+              className="mb-4 block text-sm font-semibold text-neutral/80"
+            >
+              Work Email
             </label>
-            <div className="mt-3 flex flex-col gap-3 sm:flex-row">
+            <div
+              className="
+                flex
+                items-center
+                gap-3
+                rounded-full
+                border
+                border-white/10
+                bg-white/10
+                p-2
+              "
+            >
+              <div className="pl-4 text-sky-400">
+                <Mail size={20} />
+              </div>
+
               <input
                 id="email"
                 type="email"
                 required
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                placeholder="you@company.com"
-                className="w-full rounded-2xl border border-white/10 bg-white/90 px-4 py-3 text-sm text-[#1e293b] outline-none"
+                placeholder="Enter your work email..."
+                className="
+                  flex-1
+                  bg-transparent
+                  text-white
+                  placeholder:text-slate-400
+                  outline-none
+                "
               />
-              <button
+
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
                 type="submit"
                 disabled={status === "loading"}
-                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#10b981] px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
+                className="
+                  flex
+                  items-center
+                  gap-2
+                  rounded-full
+                  bg-gradient-to-r
+                  from-sky-500
+                  to-indigo-500
+                  px-8
+                  py-4
+                  font-semibold
+                  text-white
+                  transition
+                "
               >
-                {status === "loading" ? "Joining..." : "Join ZenithCircle"}
-                <ArrowRight size={16} />
-              </button>
-            </div>
+                {status === "loading" ? "Joining..." : "Join Now"}
 
-            {status === "success" && (
-              <div className="mt-4 flex items-center gap-2 text-sm text-[#bbf7d0]">
-                <CheckCircle2 size={16} />
-                You&apos;re on the list. Expect thoughtful recovery updates soon.
+                <ArrowRight size={18} />
+              </motion.button>
+            </div>
+            <div
+              className="
+                mt-6
+                flex
+                flex-wrap
+                items-center
+                justify-center
+                gap-6
+                text-sm
+                text-slate-400
+              "
+            >
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="text-emerald-400" size={16} />
+                100% Private
               </div>
+
+              <div className="flex items-center gap-2">
+                <Sparkles className="text-amber-400" size={16} />
+                Weekly AI Insights
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Clock3 className="text-sky-400" size={16} />
+                Unsubscribe Anytime
+              </div>
+            </div>{" "}
+            {status === "success" && (
+              <motion.div
+                initial={{
+                  opacity: 0,
+                  y: 10,
+                }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                }}
+                className="
+                  mt-6
+                  flex
+                  items-center
+                  justify-center
+                  gap-2
+                  rounded-2xl
+                  border
+                  border-emerald-500/20
+                  bg-emerald-500/10
+                  px-4
+                  py-3
+                  text-sm
+                  text-emerald-300
+                "
+              >
+                <CheckCircle2 size={18} />
+                You're in! Welcome to ZenithCircle.
+              </motion.div>
             )}
             {status === "error" && (
-              <p className="mt-4 text-sm text-[#fecaca]">
-                Something went wrong. Please try again in a moment.
-              </p>
+              <motion.div
+                initial={{
+                  opacity: 0,
+                }}
+                animate={{
+                  opacity: 1,
+                }}
+                className="
+                  mt-6
+                  rounded-2xl
+                  border
+                  border-red-500/20
+                  bg-red-500/10
+                  px-4
+                  py-3
+                  text-center
+                  text-sm
+                  text-red-300
+                "
+              >
+                Something went wrong. Please try again.
+              </motion.div>
             )}
-          </form>
+          </motion.form>
         </div>
+
+        {/* Bottom Features */}
+        <motion.div
+          initial={{
+            opacity: 0,
+            y: 25,
+          }}
+          whileInView={{
+            opacity: 1,
+            y: 0,
+          }}
+          transition={{
+            delay: 0.35,
+            duration: 0.6,
+          }}
+          viewport={{
+            once: true,
+          }}
+          className="
+            mt-12
+            flex
+            flex-wrap
+            items-center
+            justify-center
+            gap-5
+          "
+        >
+          {[
+            {
+              icon: ShieldCheck,
+              title: "No Spam",
+              desc: "Privacy first",
+              color: "text-sky-400",
+            },
+            {
+              icon: Clock3,
+              title: "Weekly",
+              desc: "Fresh insights",
+              color: "text-cyan-400",
+            },
+            {
+              icon: Sparkles,
+              title: "AI Tips",
+              desc: "Practical advice",
+              color: "text-indigo-400",
+            },
+          ].map((item) => (
+            <motion.div
+              key={item.title}
+              whileHover={{
+                y: -6,
+                scale: 1.03,
+              }}
+              className="
+                flex
+                min-w-[220px]
+                items-center
+                justify-center
+                gap-4
+                rounded-2xl
+                border
+                border-white/10
+                bg-white/5
+                px-6
+                py-5
+                text-center
+                backdrop-blur-md
+                transition-all
+                duration-300
+                hover:border-accent/40
+                hover:bg-white/10
+              "
+            >
+              <div
+                className="
+                  flex
+                  h-12
+                  w-12
+                  items-center
+                  justify-center
+                  rounded-full
+                  bg-white/5
+                "
+              >
+                <item.icon size={22} className={item.color} />
+              </div>
+
+              <div className="text-left">
+                <h4 className="font-semibold text-white">{item.title}</h4>
+
+                <p className="text-sm text-slate-400">{item.desc}</p>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
       </div>
     </section>
   );
