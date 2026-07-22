@@ -123,14 +123,15 @@ export default function Newsletter() {
             viewport={{ once: true }}
             onSubmit={handleSubmit}
             className="
-              rounded-[32px]
-              border
-              border-white/10
-              bg-white/10
-              p-8
-              backdrop-blur-xl
-              shadow-2xl
-            "
+    rounded-[32px]
+    border
+    border-white/10
+    bg-white/10
+    p-5
+    sm:p-8
+    backdrop-blur-xl
+    shadow-2xl
+  "
           >
             <label
               htmlFor="email"
@@ -138,37 +139,51 @@ export default function Newsletter() {
             >
               Work Email
             </label>
+
             <div
               className="
-                flex
-                items-center
-                gap-3
-                rounded-full
-                border
-                border-white/10
-                bg-white/10
-                p-2
-              "
+      flex
+      flex-col
+      sm:flex-row
+      items-stretch
+      sm:items-center
+      gap-3
+      rounded-3xl
+      sm:rounded-full
+      border
+      border-white/10
+      bg-white/10
+      p-3
+    "
             >
-              <div className="pl-4 text-sky-400">
+              <div className="hidden sm:block pl-3 text-sky-400">
                 <Mail size={20} />
               </div>
 
-              <input
-                id="email"
-                type="email"
-                required
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                placeholder="Enter your work email..."
-                className="
-                  flex-1
-                  bg-transparent
-                  text-white
-                  placeholder:text-slate-400
-                  outline-none
-                "
-              />
+              <div className="flex items-center gap-3 flex-1">
+                <div className="sm:hidden text-sky-400 pl-2">
+                  <Mail size={20} />
+                </div>
+
+                <input
+                  id="email"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  placeholder="Enter your work email..."
+                  className="
+          flex-1
+          min-w-0
+          bg-transparent
+          text-white
+          placeholder:text-slate-400
+          outline-none
+          text-sm
+          px-2
+        "
+                />
+              </div>
 
               <motion.button
                 whileHover={{ scale: 1.03 }}
@@ -176,36 +191,44 @@ export default function Newsletter() {
                 type="submit"
                 disabled={status === "loading"}
                 className="
-                  flex
-                  items-center
-                  gap-2
-                  rounded-full
-                  bg-gradient-to-r
-                  from-sky-500
-                  to-indigo-500
-                  px-8
-                  py-4
-                  font-semibold
-                  text-white
-                  transition
-                "
+        flex
+        w-full
+        sm:w-auto
+        items-center
+        justify-center
+        gap-2
+        rounded-full
+        bg-gradient-to-r
+        from-sky-500
+        to-indigo-500
+        px-8
+        py-1.5
+        md:py-3.5
+        font-semibold
+        text-white
+        transition
+        text-sm
+      "
               >
                 {status === "loading" ? "Joining..." : "Join Now"}
-
                 <ArrowRight size={18} />
               </motion.button>
             </div>
+
             <div
               className="
-                mt-6
-                flex
-                flex-wrap
-                items-center
-                justify-center
-                gap-6
-                text-sm
-                text-slate-400
-              "
+      mt-6
+      flex
+      flex-col
+      sm:flex-row
+      flex-wrap
+      items-center
+      justify-center
+      gap-4
+      sm:gap-6
+      text-sm
+      text-slate-400
+    "
             >
               <div className="flex items-center gap-2">
                 <ShieldCheck className="text-emerald-400" size={16} />
@@ -221,57 +244,50 @@ export default function Newsletter() {
                 <Clock3 className="text-sky-400" size={16} />
                 Unsubscribe Anytime
               </div>
-            </div>{" "}
+            </div>
+
             {status === "success" && (
               <motion.div
-                initial={{
-                  opacity: 0,
-                  y: 10,
-                }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                }}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
                 className="
-                  mt-6
-                  flex
-                  items-center
-                  justify-center
-                  gap-2
-                  rounded-2xl
-                  border
-                  border-emerald-500/20
-                  bg-emerald-500/10
-                  px-4
-                  py-3
-                  text-sm
-                  text-emerald-300
-                "
+        mt-6
+        flex
+        items-center
+        justify-center
+        gap-2
+        rounded-2xl
+        border
+        border-emerald-500/20
+        bg-emerald-500/10
+        px-4
+        py-3
+        text-sm
+        text-emerald-300
+        text-center
+      "
               >
                 <CheckCircle2 size={18} />
                 You're in! Welcome to ZenithCircle.
               </motion.div>
             )}
+
             {status === "error" && (
               <motion.div
-                initial={{
-                  opacity: 0,
-                }}
-                animate={{
-                  opacity: 1,
-                }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
                 className="
-                  mt-6
-                  rounded-2xl
-                  border
-                  border-red-500/20
-                  bg-red-500/10
-                  px-4
-                  py-3
-                  text-center
-                  text-sm
-                  text-red-300
-                "
+        mt-6
+        rounded-2xl
+        border
+        border-red-500/20
+        bg-red-500/10
+        px-4
+        py-3
+        text-center
+        text-sm
+        text-red-300
+      "
               >
                 Something went wrong. Please try again.
               </motion.div>
