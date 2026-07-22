@@ -188,9 +188,9 @@ export default function DashboardSidebar() {
       {/* Mobile toggle button */}
       <button
         onClick={() => setMobileOpen(true)}
-        className="md:hidden fixed top-20 left-4 z-30 bg-[#0b1120] border border-[#1e293b] text-white p-2 rounded-xl shadow-lg"
+        className="md:hidden fixed top-3 left-0 z-30 bg-[#0b1120] border border-[#1e293b] text-white p-2 rounded-xl shadow-lg"
       >
-        <Menu size={18} />
+        <Menu size={22} />
       </button>
 
       {/* Mobile overlay */}

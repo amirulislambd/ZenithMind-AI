@@ -18,11 +18,11 @@ export const metadata: Metadata = {
     title: "About ZenithMind AI - Empowering Mental Fitness & Performance",
     description:
       "Sustaining high performance without sacrificing human well-being. Discover our mission, AI insights, and executive recovery workflows.",
-    url: "https://zenithmind.ai/about", // আপনার অরিজিনাল ডোমেইন দিন
+    url: "https://zenithmind-ai.vercel.app/about",
     siteName: "ZenithMind AI",
     images: [
       {
-        url: "/og-about.png", // public ফোল্ডারে থাকা ইমেজ পাথ
+        url: "/og-about.png",
         width: 1200,
         height: 630,
         alt: "About ZenithMind AI",
