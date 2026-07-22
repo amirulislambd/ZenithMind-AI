@@ -1,5 +1,16 @@
-import { Mail, MapPin, Phone } from "lucide-react";
+"use client";
+
 import Link from "next/link";
+import Image from "next/image";
+import { motion } from "framer-motion";
+import {
+  Mail,
+  MapPin,
+  Phone,
+  ShieldCheck,
+  Sparkles,
+  BadgeCheck,
+} from "lucide-react";
 import { BsInstagram, BsTwitterX } from "react-icons/bs";
 import { FaFacebook } from "react-icons/fa";
 import { LiaLinkedin } from "react-icons/lia";
@@ -19,118 +30,301 @@ const CATEGORIES = [
 ];
 
 const SOCIALS = [
-  { icon: FaFacebook, href: "https://facebook.com/zenithmindai", label: "Facebook" },
-  { icon: BsTwitterX, href: "https://x.com/zenithmindai", label: "X (Twitter)" },
-  { icon: LiaLinkedin, href: "https://linkedin.com/company/zenithmindai", label: "LinkedIn" },
-  { icon: BsInstagram, href: "https://instagram.com/zenithmindai", label: "Instagram" },
+  {
+    icon: FaFacebook,
+    href: "https://facebook.com/zenithmindai",
+    label: "Facebook",
+  },
+  {
+    icon: BsTwitterX,
+    href: "https://x.com/zenithmindai",
+    label: "X",
+  },
+  {
+    icon: LiaLinkedin,
+    href: "https://linkedin.com/company/zenithmindai",
+    label: "LinkedIn",
+  },
+  {
+    icon: BsInstagram,
+    href: "https://instagram.com/zenithmindai",
+    label: "Instagram",
+  },
+];
+
+const TRUST = [
+  { icon: ShieldCheck, title: "Privacy First" },
+  { icon: BadgeCheck, title: "Secure Platform" },
+  { icon: Sparkles, title: "AI Powered" },
 ];
 
 export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="w-full bg-[#050d24] text-[#cbd5e1]">
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 py-12 md:grid-cols-2 md:px-8 lg:grid-cols-4 lg:px-16">
-        {/* Column 1: Brand Info */}
-        <div>
-          <Link href="/" className="text-xl font-bold text-white">
-            ZenithMind<span className="text-[#6ba1ff]">AI</span>
+    <footer className="relative overflow-hidden border-t border-white/10 bg-[#050d24] text-slate-300 backdrop-blur-xl">
+      {/* Background Neon Ambient Glows */}
+      <div className="pointer-events-none absolute left-1/4 top-0 -z-10 h-72 w-72 rounded-full bg-blue-600/10 blur-[130px]" />
+      <div className="pointer-events-none absolute bottom-0 right-1/4 -z-10 h-80 w-80 rounded-full bg-indigo-600/10 blur-[150px]" />
+
+      <div className="relative mx-auto max-w-7xl px-4 py-10 md:px-8 lg:px-16 lg:py-16">
+        {/* =======================================================
+            1. DESKTOP & TABLET VIEW (4-Column Layout)
+           ======================================================= */}
+        <div className="hidden sm:block">
+          {/* Trust Badges */}
+          <div className="mb-12 flex flex-wrap items-center gap-3">
+            {TRUST.map((item) => (
+              <div
+                key={item.title}
+                className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-slate-200 backdrop-blur-md transition-colors hover:border-sky-500/30 hover:bg-white/10"
+              >
+                <item.icon size={16} className="text-sky-400" />
+                <span>{item.title}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
+            {/* Brand Column */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="space-y-4"
+            >
+              <Link href="/" className="inline-flex items-center gap-2.5">
+                <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-slate-900/80 p-1 shadow-md">
+                  <Image
+                    src="/aiLogo.png"
+                    alt="ZenithMind AI"
+                    width={44}
+                    height={44}
+                    className="h-full w-full object-contain"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <span className="bg-gradient-to-r from-sky-400 via-blue-400 to-indigo-400 bg-clip-text text-xl font-extrabold tracking-tight text-transparent">
+                    ZenithMind
+                  </span>
+                  <span className="text-[9px] font-semibold uppercase tracking-[0.22em] text-slate-400">
+                    AI Learning Platform
+                  </span>
+                </div>
+              </Link>
+
+              <p className="text-sm leading-relaxed text-slate-400">
+                Intelligent mental wellness powered by AI. Helping individuals
+                and teams prevent burnout before it happens.
+              </p>
+            </motion.div>
+
+            {/* Quick Links Column */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              viewport={{ once: true }}
+            >
+              <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-white">
+                Quick Links
+              </h3>
+              <ul className="space-y-2.5 text-sm">
+                {QUICK_LINKS.map((item) => (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      className="transition-colors hover:text-sky-400"
+                    >
+                      {item.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+
+            {/* Categories Column */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              viewport={{ once: true }}
+            >
+              <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-white">
+                Categories
+              </h3>
+              <ul className="space-y-2.5 text-sm">
+                {CATEGORIES.map((item) => (
+                  <li key={item.slug}>
+                    <Link
+                      href={`/explore?category=${item.slug}`}
+                      className="transition-colors hover:text-sky-400"
+                    >
+                      {item.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+
+            {/* Contact Column */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              viewport={{ once: true }}
+              className="space-y-4"
+            >
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-white">
+                Contact
+              </h3>
+              <ul className="space-y-3 text-sm">
+                <li className="flex items-center gap-2.5">
+                  <Mail size={16} className="text-sky-400 shrink-0" />
+                  <a
+                    href="mailto:support@zenithmind.ai"
+                    className="transition-colors hover:text-sky-400"
+                  >
+                    support@zenithmind.ai
+                  </a>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Phone size={16} className="text-sky-400 shrink-0" />
+                  <a
+                    href="tel:+18005551234"
+                    className="transition-colors hover:text-sky-400"
+                  >
+                    +1 (800) 555-1234
+                  </a>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <MapPin size={16} className="text-sky-400 shrink-0" />
+                  <span>Austin, Texas, United States</span>
+                </li>
+              </ul>
+
+              <div className="pt-2">
+                <p className="mb-2 text-xs font-medium text-slate-300">
+                  Follow Us
+                </p>
+                <div className="flex gap-2">
+                  {SOCIALS.map((social) => (
+                    <motion.a
+                      key={social.label}
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      whileHover={{ y: -3, scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-300 transition-colors hover:border-sky-400/40 hover:bg-sky-500 hover:text-white"
+                      aria-label={social.label}
+                    >
+                      <social.icon size={16} />
+                    </motion.a>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* =======================================================
+            2. MOBILE VIEW (Centered, Clean & Ultra-Compact)
+           ======================================================= */}
+        <div className="flex flex-col items-center text-center space-y-6 sm:hidden">
+          {/* Brand Logo & Name */}
+          <Link href="/" className="flex flex-col items-center gap-2">
+            <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-slate-900/80 p-1 shadow-md">
+              <Image
+                src="/aiLogo.png"
+                alt="ZenithMind AI"
+                width={48}
+                height={48}
+                className="h-full w-full object-contain"
+              />
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="bg-gradient-to-r from-sky-400 via-blue-400 to-indigo-400 bg-clip-text text-xl font-extrabold tracking-tight text-transparent">
+                ZenithMind
+              </span>
+              <span className="text-[8px] font-semibold uppercase tracking-[0.2em] text-slate-400">
+                AI Learning Platform
+              </span>
+            </div>
           </Link>
-          <p className="mt-3 text-sm text-[#94a3b8]">
-            Real-time cognitive health tracking and burnout prevention for
-            individuals and high-performing teams.
+
+          {/* Short 2-line Bio */}
+          <p className="text-xs text-slate-400 max-w-xs leading-relaxed">
+            Intelligent AI for Mental Wellness & Learning
           </p>
-        </div>
 
-        {/* Column 2: Quick Links */}
-        <div>
-          <h3 className="text-sm font-semibold uppercase tracking-wide text-[#7f9afe]">
-            Quick Links
-          </h3>
-          <ul className="mt-4 space-y-2">
-            {QUICK_LINKS.map((link) => (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  className="text-sm text-[#cbd5e1] transition hover:text-[#6ba1ff]"
-                >
-                  {link.label}
-                </Link>
-              </li>
+          <div className="w-full border-t border-white/10" />
+
+          {/* Essential Quick Links */}
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs font-medium text-slate-200">
+            {QUICK_LINKS.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="hover:text-sky-400"
+              >
+                {item.label}
+              </Link>
             ))}
-          </ul>
-        </div>
+          </div>
 
-        {/* Column 3: Categories */}
-        <div>
-          <h3 className="text-sm font-semibold uppercase tracking-wide text-[#7f9afe]">
-            Categories
-          </h3>
-          <ul className="mt-4 space-y-2">
-            {CATEGORIES.map((cat) => (
-              <li key={cat.slug}>
-                <Link
-                  href={`/explore?category=${cat.slug}`}
-                  className="text-sm text-primary/70 transition hover:text-accent"
-                >
-                  {cat.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Column 4: Contact & Socials */}
-        <div>
-          <h3 className="text-sm font-semibold uppercase tracking-wide text-[#7f9afe]">
-            Contact
-          </h3>
-          <ul className="mt-4 space-y-3">
-            <li className="flex items-start gap-2 text-sm text-[#cbd5e1]">
-              <Mail size={16} className="mt-0.5 shrink-0 text-[#6ba1ff]" />
-              <a href="mailto:support@zenithmind.ai" className="hover:text-[#6ba1ff]">
-                support@zenithmind.ai
-              </a>
-            </li>
-            <li className="flex items-start gap-2 text-sm text-[#cbd5e1]">
-              <Phone size={16} className="mt-0.5 shrink-0 text-[#6ba1ff]" />
-              <a href="tel:+18005551234" className="hover:text-[#6ba1ff]">
-                +1 (800) 555-1234
-              </a>
-            </li>
-            <li className="flex items-start gap-2 text-sm text-[#cbd5e1]">
-              <MapPin size={16} className="mt-0.5 shrink-0 text-[#6ba1ff]" />
-              <span>221 Wellness Ave, Suite 400, Austin, TX 78701</span>
-            </li>
-          </ul>
-
-          <div className="mt-5 flex gap-3">
+          {/* Social Icons Centered */}
+          <div className="flex items-center gap-3">
             {SOCIALS.map((social) => (
               <a
                 key={social.label}
                 href={social.href}
                 target="_blank"
                 rel="noopener noreferrer"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-slate-900 text-slate-300 transition-colors active:scale-95"
                 aria-label={social.label}
-                className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#0b1633] text-[#cbd5e1] transition hover:bg-[#1666ff] hover:text-white"
               >
                 <social.icon size={16} />
               </a>
             ))}
           </div>
-        </div>
-      </div>
 
-      {/* Bottom Compliance Bar */}
-      <div className="border-t border-[#173056]">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-6 text-xs text-[#94a3b8] md:flex-row md:px-8 lg:px-16">
-          <p>© {year} ZenithMind AI. All rights reserved.</p>
-          <div className="flex gap-5">
-            <Link href="/privacy-policy" className="hover:text-[#6ba1ff]">
+          <div className="w-full border-t border-white/10" />
+
+          {/* Compact Legal Links */}
+          <div className="flex items-center justify-center gap-4 text-[11px] text-slate-400">
+            <Link href="/privacy-policy" className="hover:text-slate-200">
               Privacy Policy
             </Link>
-            <Link href="/terms-of-service" className="hover:text-[#6ba1ff]">
+            <span>•</span>
+            <Link href="/terms-of-service" className="hover:text-slate-200">
               Terms of Service
+            </Link>
+            <span>•</span>
+            <Link href="/cookies" className="hover:text-slate-200">
+              Cookies
+            </Link>
+          </div>
+        </div>
+
+        {/* =======================================================
+            3. GLOBAL BOTTOM BAR
+           ======================================================= */}
+        <div className="mt-10 border-t border-white/10 pt-6 text-center text-xs text-slate-500 sm:flex sm:items-center sm:justify-between sm:text-left">
+          <p>
+            © {year}{" "}
+            <span className="font-semibold text-slate-300">ZenithMind AI</span>.
+            All rights reserved.
+          </p>
+          <div className="hidden sm:flex items-center gap-6">
+            <Link href="/privacy-policy" className="hover:text-sky-400">
+              Privacy Policy
+            </Link>
+            <Link href="/terms-of-service" className="hover:text-sky-400">
+              Terms of Service
+            </Link>
+            <Link href="/cookies" className="hover:text-sky-400">
+              Cookies
             </Link>
           </div>
         </div>
