@@ -6,7 +6,12 @@ interface UseVoiceAssistantOptions {
   setInput: (value: string | ((prev: string) => string)) => void;
 }
 
-type RecognitionLanguage = "bn-BD" | "ar-SA" | "en-US" | "ur-PK";
+// Note: English uses "en-IN" (Indian English) rather than "en-US". Chrome's
+// Web Speech API applies a much stricter confidence threshold for "en-US"
+// and frequently discards results for South Asian accents (silently — no
+// error, just nothing appended). "en-IN" uses an acoustic model that matches
+// this accent far better, so results actually come through.
+type RecognitionLanguage = "bn-BD" | "ar-SA" | "en-IN" | "ur-PK";
 
 export function useVoiceAssistant({ setInput }: UseVoiceAssistantOptions) {
   const [isListening, setIsListening] = useState(false);
@@ -21,6 +26,21 @@ export function useVoiceAssistant({ setInput }: UseVoiceAssistantOptions) {
   const lastInterimRef = useRef("");
   const draftTranscriptRef = useRef("");
 
+  // If listening starts but no result (interim or final) arrives within
+  // this window, we surface a clear message instead of silently doing
+  // nothing — this is exactly the "spoke English, nothing showed up" case.
+  const noResultTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
+  const gotAnyResultRef = useRef(false);
+
+  const clearNoResultTimeout = () => {
+    if (noResultTimeoutRef.current) {
+      clearTimeout(noResultTimeoutRef.current);
+      noResultTimeoutRef.current = null;
+    }
+  };
+
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -30,7 +50,7 @@ export function useVoiceAssistant({ setInput }: UseVoiceAssistantOptions) {
 
     if (!SpeechRecognitionCtor) {
       setVoiceError(
-        "আপনার ব্রাউজারে স্পিচ রিকগনিশন ফিচারটি সমর্থিত নয়। Google Chrome ব্যবহার করুন।",
+        "আপনার ব্রাউজারে স্পিচ রিকগনিশন ফিচারটি সমর্থিত নয়। Google Chrome ব্যবহার করুন।",
       );
       return;
     }
@@ -45,6 +65,9 @@ export function useVoiceAssistant({ setInput }: UseVoiceAssistantOptions) {
       const normalizedValue = value.replace(/\s+/g, " ").trim();
 
       if (!normalizedValue) return;
+
+      gotAnyResultRef.current = true;
+      clearNoResultTimeout();
 
       // Interim speech
       if (isInterim) {
@@ -123,10 +146,25 @@ export function useVoiceAssistant({ setInput }: UseVoiceAssistantOptions) {
     recognition.onstart = () => {
       setIsListening(true);
       setVoiceError(null);
+      gotAnyResultRef.current = false;
+
+      // Give it 6s to produce *any* result. If nothing comes back, most
+      // likely the recognizer is discarding low-confidence matches for
+      // this language/accent combo — tell the user plainly instead of
+      // leaving the input box silently empty.
+      clearNoResultTimeout();
+      noResultTimeoutRef.current = setTimeout(() => {
+        if (!gotAnyResultRef.current) {
+          setVoiceError(
+            "কথা শোনা গেলেও লেখা তৈরি হচ্ছে না। ধীরে ও স্পষ্ট করে আবার বলার চেষ্টা করুন, অথবা ভাষা পরিবর্তন করে দেখুন।",
+          );
+        }
+      }, 6000);
     };
 
     recognition.onerror = (event: any) => {
       setIsListening(false);
+      clearNoResultTimeout();
 
       if (event?.error === "not-allowed") {
         setVoiceError(
@@ -141,6 +179,7 @@ export function useVoiceAssistant({ setInput }: UseVoiceAssistantOptions) {
 
     recognition.onend = () => {
       setIsListening(false);
+      clearNoResultTimeout();
 
       if (recognitionRef.current) {
         recognitionRef.current.lang = selectedLanguage;
@@ -150,6 +189,7 @@ export function useVoiceAssistant({ setInput }: UseVoiceAssistantOptions) {
     recognitionRef.current = recognition;
 
     return () => {
+      clearNoResultTimeout();
       try {
         recognition.stop();
       } catch {}
@@ -166,6 +206,7 @@ export function useVoiceAssistant({ setInput }: UseVoiceAssistantOptions) {
 
       setIsListening(false);
       lastInterimRef.current = "";
+      clearNoResultTimeout();
     } else {
       try {
         setVoiceError(null);

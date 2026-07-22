@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Select, ListBox, Label } from "@heroui/react";
 import { Mic, MicOff, SendHorizonal, ChevronDown, Check } from "lucide-react";
 
-type RecognitionLanguage = "bn-BD" | "ar-SA" | "en-US" | "ur-PK";
+type RecognitionLanguage = "bn-BD" | "ar-SA" | "en-IN" | "ur-PK";
 
 export default function ChatComposer({
   input,
@@ -33,12 +33,12 @@ export default function ChatComposer({
   const resizeTextarea = () => {
     const textarea = textareaRef.current;
     if (!textarea) return;
-    requestAnimationFrame(() => {
-      textarea.style.height = "auto";
-      const maxHeight = 160; // px, matches max-h-40
-      const newHeight = Math.min(textarea.scrollHeight, maxHeight);
-      textarea.style.height = `${newHeight}px`;
-    });
+    // Reset first so scrollHeight reflects the *shrunk* content too
+    // (otherwise the box only ever grows, never shrinks back down).
+    textarea.style.height = "auto";
+    const maxHeight = 200; // px, matches max-h-[200px] below
+    const newHeight = Math.min(textarea.scrollHeight, maxHeight);
+    textarea.style.height = `${newHeight}px`;
   };
 
   useEffect(() => {
@@ -53,9 +53,12 @@ export default function ChatComposer({
         </p>
       )}
 
-      <form onSubmit={onSubmit} className="flex flex-col gap-2">
-        <div className="flex flex-col gap-2.5 rounded-2xl border border-white/10 bg-slate-900/80 p-2.5 shadow-inner shadow-black/30 sm:flex-row sm:items-end sm:gap-2">
-          {/* Auto-growing textarea up to max-h-40, then scrolls internally */}
+      <form onSubmit={onSubmit}>
+        {/* Always a vertical stack: full-width text area on top, controls
+            pinned in their own row below. Never side-by-side, so the
+            textarea always gets the full card width to type into and the
+            buttons never overlap with growing text. */}
+        <div className="flex flex-col rounded-3xl border border-white/10 bg-slate-900/80 shadow-inner shadow-black/30">
           <textarea
             ref={textareaRef}
             value={input}
@@ -72,10 +75,16 @@ export default function ChatComposer({
             placeholder="Ask anything… বাংলায় লিখতে পারেন।"
             disabled={isStreaming}
             rows={1}
-            className="box-border max-h-40 min-h-11 w-full min-w-0 flex-1 resize-none overflow-y-auto border-0 bg-transparent px-2.5 py-2 text-base text-slate-100 outline-none placeholder:text-slate-500 disabled:opacity-60 sm:text-sm"
+            className="box-border max-h-[200px] min-h-[52px] w-full resize-none overflow-y-auto border-0 bg-transparent px-4 pt-3.5 pb-1 text-base leading-6 text-slate-100 outline-none placeholder:text-slate-500 disabled:opacity-60 sm:text-[15px] scrollbar-thin scrollbar-track-transparent scrollbar-thumb-indigo-600/60 hover:scrollbar-thumb-indigo-500/70"
+            style={{
+              scrollbarWidth: "thin",
+              scrollbarColor: "rgb(79 70 229 / 0.6) transparent",
+            }}
           />
-          {/* Action Toolbar */}
-          <div className="flex items-center justify-between gap-2 border-t border-white/5 pt-2 sm:shrink-0 sm:justify-end sm:border-0 sm:pt-0">
+
+          {/* Controls row: always full width, always below the text,
+              regardless of screen size. */}
+          <div className="flex items-center justify-between gap-2 px-2.5 pb-2.5 pt-1.5">
             <Select
               aria-label="Select voice input language"
               selectedKey={selectedLanguage}
@@ -141,7 +150,7 @@ export default function ChatComposer({
                   </ListBox.Item>
 
                   <ListBox.Item
-                    id="en-US"
+                    id="en-IN"
                     className="w-full bg-transparent outline-none data-hovered:bg-slate-800 data-focused:bg-slate-800 data-focus-visible:bg-slate-800 data-pressed:bg-slate-800"
                   >
                     {({ isSelected, isHovered }) => (
